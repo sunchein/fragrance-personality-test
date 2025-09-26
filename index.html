@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>十二香氛人格測評系統</title>
+    <title>香氛人格測評系統</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <!-- PDF 與截圖工具 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -21,11 +20,10 @@
 <body class="bg-gray-100 min-h-screen font-sans leading-relaxed">
     <div class="container mx-auto px-4 py-6">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">十二香氛人格測評系統</h1>
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">香氛人格測評系統</h1>
             <p class="text-gray-600">根據十二型人格與六合陰陽理論，為您定製專屬香氛建議。</p>
         </header>
 
-        <!-- 受測者信息輸入區 -->
         <section id="infoSection" class="bg-white p-6 rounded-xl card-shadow mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <i class="fa fa-address-card mr-3 text-blue-600"></i>受測者資訊
@@ -54,21 +52,18 @@
             </div>
         </section>
 
-        <!-- 測評問卷區 -->
         <section id="questionSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <i class="fa fa-question-circle mr-3 text-blue-600"></i>人格測評問卷
             </h2>
             <div id="questionContainer" class="mb-6">
-                <!-- 問題將動態呈現 -->
-            </div>
+                </div>
             <div class="flex justify-between items-center">
                 <button id="prevQuestionBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full" disabled>上一題</button>
                 <button id="nextQuestionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-full">下一題</button>
             </div>
         </section>
 
-        <!-- 測評結果區 -->
         <section id="resultSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center">
@@ -87,11 +82,9 @@
                 </div>
             </div>
             <div id="resultContent" class="space-y-4">
-                <!-- 結果將動態填充 -->
-            </div>
+                </div>
         </section>
 
-        <!-- 歷史記錄模態框 -->
         <div id="historyModal" class="fixed inset-0 bg-black/50 modal-backdrop hidden flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
                 <div class="p-6 border-b flex justify-between items-center">
@@ -101,8 +94,7 @@
                     </button>
                 </div>
                 <div id="historyList" class="overflow-y-auto flex-grow p-6">
-                    <!-- 歷史記錄列表 -->
-                </div>
+                    </div>
                 <div class="p-4 border-t bg-gray-50 flex justify-end">
                     <button id="clearHistoryBtn" class="text-red-600 hover:text-red-700 text-sm font-medium">
                         <i class="fa fa-trash mr-1"></i>清空歷史
@@ -433,11 +425,18 @@
             questionSection.classList.remove('hidden');
             renderQuestion();
         });
-
-        // 查看歷史按鈕事件
+        
+        // 查看歷史按鈕事件，增加密碼驗證
         document.getElementById('viewHistoryBtn').addEventListener('click', () => {
-            loadHistory();
-            historyModal.classList.remove('hidden');
+            // 跳出一個輸入框，要求使用者輸入密碼
+            const password = prompt("請輸入管理員密碼：");
+            // 檢查密碼是否正確
+            if (password === "sun20020503") {
+                loadHistory();
+                historyModal.classList.remove('hidden');
+            } else if (password !== null) { // 如果使用者不是按取消
+                alert('密碼錯誤！');
+            }
         });
 
         // 關閉歷史模態框
@@ -490,7 +489,7 @@
                 <div class="space-y-3">
                     ${[1,2,3,4,5].map(value => `
                         <label class="flex items-center space-x-3">
-                            <input type="radio" name="q${q.id}" value="${value}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <input type="radio" name="q${q.id}" value="${value}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" ${ (responses[q.dimension] === value) ? 'checked' : '' }>
                             <span class="text-gray-700">${value === 1 ? '非常不同意' : value === 2 ? '不同意' : value === 3 ? '中立' : value === 4 ? '同意' : '非常同意'}</span>
                         </label>
                     `).join('')}
@@ -501,48 +500,42 @@
             nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '提交測評' : '下一題';
         }
 
-  // 顯示結果
+        // 顯示結果
         function showResult() {
             questionSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
 
-            // --- START: 修正後的程式碼 ---
-            // 修正問題：處理同分情況，避免每次結果都相同。
-            // 原始碼在遇到多個最高分時，總是選擇列表中的第一個，導致結果重複。
-            // 新的邏輯會找出所有最高分的選項，然後從中隨機選擇一個作為結果。
-
-            // 1. 從所有回答中找出最高分是多少
+            // 處理同分情況，避免每次結果都相同
             const bestScore = Math.max(...Object.values(responses));
-            
-            // 2. 找出所有得到這個最高分的人格維度
             const tiedDimensions = Object.keys(responses).filter(dim => responses[dim] === bestScore);
-            
-            // 3. 從同分的維度中隨機選擇一個作為最終結果
             const bestDim = tiedDimensions[Math.floor(Math.random() * tiedDimensions.length)];
-            // --- END: 修正後的程式碼 ---
 
             const result = personalityData[bestDim];
-            
+
             // 保存當次評測資料
             const userName = document.getElementById('userName').value.trim();
             const userPhone = document.getElementById('userPhone').value.trim();
             const userNote = document.getElementById('userNote').value.trim();
             const timestamp = new Date().toISOString();
             const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, details: result };
-            
+
             // 渲染結果
             renderResultCard(resultObject);
-            
+
             // 設置保存事件
             document.getElementById('saveResultBtn').onclick = () => saveResult(resultObject);
-            
+
             // 設置導出事件
             document.getElementById('exportPdfBtn').onclick = () => exportReport(resultObject);
-            
-            // 設置重新測評
+
+            // 設置重新測評事件，並清空姓名欄位
             document.getElementById('restartBtn').onclick = () => {
                 resultSection.classList.add('hidden');
                 infoSection.classList.remove('hidden');
+                // 清空姓名輸入框
+                document.getElementById('userName').value = '';
+                document.getElementById('userPhone').value = '';
+                document.getElementById('userNote').value = '';
             };
         }
 
@@ -589,7 +582,6 @@
             results.push(obj);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
             alert('結果已保存！');
-            loadHistory();
         }
 
         // 讀取歷史並渲染
@@ -600,6 +592,7 @@
                 historyList.innerHTML = '<p class="text-center text-gray-500">暫無測評記錄</p>';
                 return;
             }
+            results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 讓最新的紀錄顯示在最上面
             results.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'border rounded-lg p-4 mb-3 hover:bg-gray-50 cursor-pointer';
@@ -619,12 +612,15 @@
                     questionSection.classList.add('hidden');
                     resultSection.classList.remove('hidden');
                     renderResultCard(item);
-                    // 重新綁定按鈕以保存不同對象
+                    // 重新綁定按鈕
                     document.getElementById('saveResultBtn').onclick = () => saveResult(item);
                     document.getElementById('exportPdfBtn').onclick = () => exportReport(item);
                     document.getElementById('restartBtn').onclick = () => {
                         resultSection.classList.add('hidden');
                         infoSection.classList.remove('hidden');
+                        document.getElementById('userName').value = '';
+                        document.getElementById('userPhone').value = '';
+                        document.getElementById('userNote').value = '';
                     };
                 });
                 historyList.appendChild(div);
@@ -633,24 +629,47 @@
 
         // 導出報告為 PDF
         async function exportReport(obj) {
-            const element = document.getElementById('resultSection');
-            const canvas = await html2canvas(element, { scale: 2 });
+            const { jsPDF } = window.jspdf;
+            const element = document.getElementById('resultContent');
+            
+            // 為了讓PDF截圖更完整，暫時移除box-shadow
+            element.classList.remove('card-shadow');
+
+            const canvas = await html2canvas(element, { 
+                scale: 2,
+                useCORS: true 
+            });
+
+            // 恢復box-shadow
+            element.classList.add('card-shadow');
+
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jspdf.jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const imgWidth = pageWidth;
-            const imgHeight = canvas.height * imgWidth / canvas.width;
-            let position = 0;
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            if (imgHeight > pageHeight) {
-                while (position + pageHeight < imgHeight) {
-                    position += pageHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
-                }
+            
+            const pdf = new jsPDF({
+                orientation: 'p',
+                unit: 'pt',
+                format: 'a4'
+            });
+
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const margin = 40;
+            const contentWidth = pdfWidth - margin * 2;
+            const imgHeight = canvas.height * contentWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = margin;
+
+            pdf.addImage(imgData, 'PNG', margin, position, contentWidth, imgHeight);
+            heightLeft -= (pdfHeight - margin * 2);
+
+            while (heightLeft > 0) {
+                position = margin - (imgHeight - heightLeft);
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', margin, position, contentWidth, imgHeight);
+                heightLeft -= (pdfHeight - margin);
             }
-            pdf.save(`${obj.userName}_${obj.type}_香氛人格報告.pdf`);
+            
+            pdf.save(`${obj.userName}_${obj.type.split(' ')[0]}_香氛人格報告.pdf`);
         }
     </script>
 </body>
