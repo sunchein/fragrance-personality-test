@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十二香氛人格測評系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- PDF 與截圖工具 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(3px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans leading-relaxed">
+    <div class="container mx-auto px-4 py-6">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">十二香氛人格測評系統</h1>
+            <p class="text-gray-600">根據十二型人格與六合陰陽理論，為您定製專屬香氛建議。</p>
+        </header>
+
+        <!-- 受測者信息輸入區 -->
+        <section id="infoSection" class="bg-white p-6 rounded-xl card-shadow mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fa fa-address-card mr-3 text-blue-600"></i>受測者資訊
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+                    <input id="userName" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請輸入姓名">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">電話</label>
+                    <input id="userPhone" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                    <input id="userNote" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <button id="startTestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
+                    <i class="fa fa-play mr-2"></i>開始測評
+                </button>
+                <button id="viewHistoryBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
+                    <i class="fa fa-history mr-2"></i>查看歷史紀錄
+                </button>
+            </div>
+        </section>
+
+        <!-- 測評問卷區 -->
+        <section id="questionSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fa fa-question-circle mr-3 text-blue-600"></i>人格測評問卷
+            </h2>
+            <div id="questionContainer" class="mb-6">
+                <!-- 問題將動態呈現 -->
+            </div>
+            <div class="flex justify-between items-center">
+                <button id="prevQuestionBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full" disabled>上一題</button>
+                <button id="nextQuestionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-full">下一題</button>
+            </div>
+        </section>
+
+        <!-- 測評結果區 -->
+        <section id="resultSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-star mr-3 text-blue-600"></i>測評結果
+                </h2>
+                <div class="flex gap-3">
+                    <button id="saveResultBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-save mr-2"></i>保存結果
+                    </button>
+                    <button id="exportPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-file-pdf-o mr-2"></i>導出報告
+                    </button>
+                    <button id="restartBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-refresh mr-2"></i>重新測評
+                    </button>
+                </div>
+            </div>
+            <div id="resultContent" class="space-y-4">
+                <!-- 結果將動態填充 -->
+            </div>
+        </section>
+
+        <!-- 歷史記錄模態框 -->
+        <div id="historyModal" class="fixed inset-0 bg-black/50 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">測評歷史紀錄</h3>
+                    <button id="closeHistoryBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="historyList" class="overflow-y-auto flex-grow p-6">
+                    <!-- 歷史記錄列表 -->
+                </div>
+                <div class="p-4 border-t bg-gray-50 flex justify-end">
+                    <button id="clearHistoryBtn" class="text-red-600 hover:text-red-700 text-sm font-medium">
+                        <i class="fa fa-trash mr-1"></i>清空歷史
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化十二型人格資料
+        const personalityData = {
+            leader: {
+                code: "01",
+                name: "領導者 (Leader)",
+                ...{
+                    traits: "果斷、權威、目標導向",
+                    scentType: "木質辛香調",
+                    essentialOilFormula: "黑胡椒20% + 肉桂皮15% + 薑20% + 佛手柑25% + 檸檬20%",
+                    essentialOilName: "赤焰之力",
+                    perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草",
+                    perfumeName: "王者脈動",
+                    colorName: "赤炎色",
+                    colorHex: "#FF4500",
+                    liuhe: "陽火",
+                    bodySystem: "循環系統",
+                    emotion: "驕傲 / 榮耀（正向自信）",
+                    sound: "陽宮音",
+                    scentMeaning: "帶領與決斷力",
+                    healthTips: "需要注意膽的疏泄功能，壓力大或作息不規律可能影響決斷力，易有偏頭痛、失眠問題。",
+                    healthBenefit: "心血管系統，強化循環，提升決斷力；需注意膽經，避免熬夜導致偏頭痛、失眠。",
+                    tribe: "猶大",
+                    blessingClue: "王杖不離猶大、帶領群體",
+                    scripture: "創49:8-12；申33:7"
+                }
+            },
+            collaborator: {
+                code: "02",
+                name: "合作者 (Collaborator)",
+                traits: "親和、包容、溫暖",
+                scentType: "白花麝香調",
+                essentialOilFormula: "甜橙35% + 西班牙天竺葵25% + 薰衣草20% + 安息香20%",
+                essentialOilName: "晨曦擁抱",
+                perfumeFormula: "前：橘子花/檸檬 | 中：玫瑰/天竺葵 | 後：檀香/琥珀",
+                perfumeName: "光之和諧",
+                colorName: "橙曦色",
+                colorHex: "#FFA500",
+                liuhe: "陰木",
+                bodySystem: "神經系統",
+                emotion: "信任 / 安心",
+                sound: "陰羽音",
+                scentMeaning: "溫暖包容",
+                healthTips: "情緒敏感，需注意心血管系統，避免過度為他人犧牲導致心力耗損。",
+                healthBenefit: "神經系統，舒緩焦慮，提升情感連結；需注意心血管與心包經健康。",
+                tribe: "流便",
+                blessingClue: "看哪，有子如水不穩→求存活而不減少",
+                scripture: "創49:3-4；申33:6"
+            },
+            creator: {
+                code: "03",
+                name: "創意者 (Creator)",
+                traits: "靈感、自由、藝術性",
+                scentType: "柑橘花香調",
+                essentialOilFormula: "檸檬30% + 佛手柑25% + 羅勒20% + 快樂鼠尾草25%",
+                essentialOilName: "靈光綻放",
+                perfumeFormula: "前：檸檬/佛手柑 | 中：鼠尾草/茉莉 | 後：雪松/岩蘭草",
+                perfumeName: "黃金靈感",
+                colorName: "金光色",
+                colorHex: "#FFD700",
+                liuhe: "陽木",
+                bodySystem: "消化系統",
+                emotion: "快樂 / 靈感",
+                sound: "陽角音",
+                scentMeaning: "靈感創造力",
+                healthTips: "情緒起伏大，需注意心的功能，如思維與情緒管理，心火過旺影響睡眠。",
+                healthBenefit: "腦神經與消化，提升專注與靈感；需注意心火過旺影響睡眠。",
+                tribe: "西布倫",
+                blessingClue: "居海口、對外拓展與商旅",
+                scripture: "創49:13；申33:18-19"
+            },
+            implementer: {
+                code: "04",
+                name: "實踐者 (Implementer)",
+                traits: "務實、穩定、耐力",
+                scentType: "木質芳香馥奇–柑苔調",
+                essentialOilFormula: "檜木30% + 黑雲杉25% + 薰衣草20% + 絲柏25%",
+                essentialOilName: "山岩之心",
+                perfumeFormula: "前：綠葉/迷迭香 | 中：絲柏/薰衣草 | 後：檀香/乳香",
+                perfumeName: "綠石承諾",
+                colorName: "翠岩色",
+                colorHex: "#228B22",
+                liuhe: "陽土",
+                bodySystem: "肌肉系統",
+                emotion: "期待 / 毅力",
+                sound: "陽徵音",
+                scentMeaning: "執行與穩健",
+                healthTips: "可能過於保守固執，需注意消化系統功能，避免過度思慮影響胃氣。",
+                healthBenefit: "肌肉骨骼，提升耐力與持續力；需注意消化系統避免胃脹與消化不良。",
+                tribe: "以薩迦",
+                blessingClue: "強壯如驢、識時務、肯負重",
+                scripture: "創49:14-15；申33:18"
+            },
+            adventurer: {
+                code: "05",
+                name: "冒險者 (Adventurer)",
+                traits: "好奇、勇敢、自由不羈",
+                scentType: "清新木質調",
+                essentialOilFormula: "薄荷25% + 杜松25% + 冷杉25% + 冬青25%",
+                essentialOilName: "天空之旅",
+                perfumeFormula: "前：檸檬草/葡萄柚 | 中：薄荷/杜松子 | 後：雪松/麝香",
+                perfumeName: "無垠蒼穹",
+                colorName: "蒼穹色",
+                colorHex: "#00BFFF",
+                liuhe: "陽金",
+                bodySystem: "呼吸系統",
+                emotion: "驚訝 / 勇氣",
+                sound: "陽商音",
+                scentMeaning: "探索與自由",
+                healthTips: "好奇心強但易缺耐心，需注意膀胱經與水液代謝，避免腰背酸痛。",
+                healthBenefit: "呼吸系統，清新暢通，帶來冒險能量；需注意膀胱經與水液代謝。",
+                tribe: "迦得",
+                blessingClue: "被追擊仍反勝、戰士性格",
+                scripture: "創49:19；申33:20-21"
+            },
+            guardian: {
+                code: "06",
+                name: "守護者 (Guardian)",
+                traits: "忠誠、保護、安定",
+                scentType: "草本花香木質調",
+                essentialOilFormula: "乳香30% + 絲柏25% + 薰衣草20% + 安息香25%",
+                essentialOilName: "深藍守望",
+                perfumeFormula: "前：薰衣草/佛手柑 | 中：乳香/沒藥 | 後：岩蘭草/沉香",
+                perfumeName: "夜的守護",
+                colorName: "靛藍色",
+                colorHex: "#4B0082",
+                liuhe: "陰火",
+                bodySystem: "免疫系統",
+                emotion: "愛 / 溫柔力量",
+                sound: "陰宮音",
+                scentMeaning: "保護與忠誠",
+                healthTips: "可能過度擔憂、犧牲自我，需注意脾胃與氣血生成。",
+                healthBenefit: "免疫系統，鎮靜安定，守護身心；需注意脾胃與氣血生成，避免過度思慮。",
+                tribe: "西緬",
+                blessingClue: "與利未同被分散、需轉化烈性",
+                scripture: "創49:5-7"
+            },
+            explorer: {
+                code: "07",
+                name: "探索者 (Explorer)",
+                traits: "神秘、追尋、靈性",
+                scentType: "樹脂木質調",
+                essentialOilFormula: "乳香25% + 杜松25% + 快樂鼠尾草25% + 沈香子25%",
+                essentialOilName: "紫晶心旅",
+                perfumeFormula: "前：葡萄柚/黑胡椒 | 中：薰衣草/鼠尾草 | 後：檀香/琥珀",
+                perfumeName: "未知旅程",
+                colorName: "紫晶色",
+                colorHex: "#9370DB",
+                liuhe: "陰靈",
+                bodySystem: "內分泌系統",
+                emotion: "神秘 / 直覺",
+                sound: "陰角音",
+                scentMeaning: "靈性追尋",
+                healthTips: "可能顯得孤僻，不易親近，需注意全身氣機與內分泌平衡。",
+                healthBenefit: "靈性與內分泌，助於冥想與內觀；需注意三焦氣機與睡眠品質。",
+                tribe: "便雅憫",
+                blessingClue: "如狼勇猛、蒙愛而安居",
+                scripture: "創49:27；申33:12"
+            },
+            achiever: {
+                code: "08",
+                name: "成就者 (Achiever)",
+                traits: "目標、驅動力、榮耀",
+                scentType: "木質草本辛香調",
+                essentialOilFormula: "薑30% + 黑胡椒20% + 肉桂葉25% + 療創木25%",
+                essentialOilName: "金耀驅動",
+                perfumeFormula: "前：佛手柑/葡萄柚 | 中：生薑/肉桂 | 後：檀香/乳香",
+                perfumeName: "榮耀之光",
+                colorName: "鎏金色",
+                colorHex: "#DAA520",
+                liuhe: "陽火",
+                bodySystem: "消化＋肝膽",
+                emotion: "憤怒→驅動力",
+                sound: "陽羽音",
+                scentMeaning: "成就與榮耀",
+                healthTips: "可能控制慾強、易累積壓力，需注意肝氣疏泄，避免眼睛疲勞。",
+                healthBenefit: "消化與循環，增強動力與行動力；需注意肝氣疏泄與眼睛疲勞。",
+                tribe: "但",
+                blessingClue: "為民伸冤、機警如蛇、小獅子",
+                scripture: "創49:16-17；申33:22"
+            },
+            idealist: {
+                code: "09",
+                name: "理想者 (Idealist)",
+                traits: "浪漫、純潔、理想性",
+                scentType: "花香柑苔調",
+                essentialOilFormula: "西班牙天竺葵30% + 薰衣草25% + 佛手柑25% + 芳樟20%",
+                essentialOilName: "月光清心",
+                perfumeFormula: "前：橙花/檸檬 | 中：玫瑰/薰衣草 | 後：檀香/白麝香",
+                perfumeName: "月下花園",
+                colorName: "月光色",
+                colorHex: "#F0E68C",
+                liuhe: "陰木",
+                bodySystem: "呼吸 / 肺系統",
+                emotion: "悲傷→慈悲",
+                sound: "陰商音",
+                scentMeaning: "浪漫與理想",
+                healthTips: "可能不切實際，過於感性，需注意呼吸系統與免疫力。",
+                healthBenefit: "神經與情緒，帶來浪漫與平衡；需注意肺功能與免疫，避免感冒咳嗽。",
+                tribe: "約瑟",
+                blessingClue: "增添結果、被保護祝福滿溢",
+                scripture: "創49:22-26；申33:13-17"
+            },
+            inspirator: {
+                code: "10",
+                name: "靈感者 (Inspirator)",
+                traits: "靈性、啟發、無限",
+                scentType: "熏香琥珀東方調",
+                essentialOilFormula: "檸檬25% + 迷迭香25% + 快樂鼠尾草25% + 綠花白千層25%",
+                essentialOilName: "星河之息",
+                perfumeFormula: "前：檸檬/薄荷 | 中：迷迭香/鼠尾草 | 後：雪松/琥珀",
+                perfumeName: "銀河迴響",
+                colorName: "銀河色",
+                colorHex: "#E6E6FA",
+                liuhe: "陽靈",
+                bodySystem: "泌尿 / 腎系統",
+                emotion: "焦慮→靈感",
+                sound: "陽徵音",
+                scentMeaning: "啟迪與靈性",
+                healthTips: "內在矛盾、容易焦慮，需注意泌尿生殖系統與腎精。",
+                healthBenefit: "腦神經與呼吸，開啟洞察與靈感；需注意腎精與記憶力，避免過勞。",
+                tribe: "亞設",
+                blessingClue: "出肥美之糧、受歡悅、昌盛",
+                scripture: "創49:20；申33:24-25"
+            },
+            architect: {
+                code: "11",
+                name: "建築大師 (Architect)",
+                traits: "穩固、結構、務實",
+                scentType: "綠意柑苔調",
+                essentialOilFormula: "黑雲杉25% + 紫檀25% + 肖楠25% + 芳樟25%",
+                essentialOilName: "大地基石",
+                perfumeFormula: "前：綠葉/黑胡椒 | 中：絲柏/雪松 | 後：岩蘭草/檀香",
+                perfumeName: "築夢大地",
+                colorName: "大地色",
+                colorHex: "#8B4513",
+                liuhe: "陰土",
+                bodySystem: "骨骼 / 皮膚系統",
+                emotion: "羞愧→責任",
+                sound: "陰羽音",
+                scentMeaning: "結構與穩固",
+                healthTips: "壓力巨大、責任感重，需注意腸道健康與排泄功能。",
+                healthBenefit: "骨骼與皮膚，建立結構與保護力；需注意腸道與排泄，避免便秘。",
+                tribe: "以法蓮",
+                blessingClue: "如野牛之角、萬民之首",
+                scripture: "申33:17（約瑟之內）"
+            },
+            soulMentor: {
+                code: "12",
+                name: "靈魂導師 (Soul Mentor)",
+                traits: "智慧、靈魂啟迪、聖潔",
+                scentType: "花香東方調",
+                essentialOilFormula: "乳香30% + 安息香25% + 沈香子25% + 羅文莎葉20%",
+                essentialOilName: "聖光之息",
+                perfumeFormula: "前：橙花/佛手柑 | 中：乳香/沒藥 | 後：檀香/琥珀/麝香",
+                perfumeName: "永恆聖潔",
+                colorName: "聖光色",
+                colorHex: "#FFFACD",
+                liuhe: "陰靈",
+                bodySystem: "生殖＋小腸",
+                emotion: "愛 / 智慧",
+                sound: "陰徵音",
+                scentMeaning: "聖潔與啟發",
+                healthTips: "需在理想與現實中平衡，避免過度犧牲，注意小腸功能與營養吸收。",
+                healthBenefit: "靈性與免疫，深層冥想與靈魂啟發；需注意小腸功能與營養吸收。",
+                tribe: "利未",
+                blessingClue: "祭司職分、教導律法、事奉",
+                scripture: "創49:5-7；申33:8-11"
+            }
+        };
+
+        // 測試問卷定義，每題對應一個人格維度
+        const questions = [
+            { id: 1, text: "我喜歡設定方向並帶領他人完成目標。", dimension: "leader" },
+            { id: 2, text: "我重視團隊合作，願意聆聽並支持他人。", dimension: "collaborator" },
+            { id: 3, text: "我富有創意，喜歡嘗試新點子或藝術表達。", dimension: "creator" },
+            { id: 4, text: "我務實穩健，喜歡按計劃持續推進。", dimension: "implementer" },
+            { id: 5, text: "我喜歡冒險和探索未知，對新體驗充滿好奇。", dimension: "adventurer" },
+            { id: 6, text: "我具備保護他人與提供支持的天性，重視安全與忠誠。", dimension: "guardian" },
+            { id: 7, text: "我對宇宙與自我靈性層面感興趣，喜歡探索神秘事物。", dimension: "explorer" },
+            { id: 8, text: "我有強烈的目標感和驅動力，渴望達成卓越成就。", dimension: "achiever" },
+            { id: 9, text: "我注重理想與浪漫，常常從夢想中獲得力量。", dimension: "idealist" },
+            { id: 10, text: "我對靈性與啟發性的經驗感興趣，熱衷於尋求內在洞察。", dimension: "inspirator" },
+            { id: 11, text: "我善於建立結構與秩序，重視實用與穩固。", dimension: "architect" },
+            { id: 12, text: "我渴望啟迪他人靈魂，追求智慧與聖潔的生活。", dimension: "soulMentor" }
+        ];
+
+        // 問卷流程控制變量
+        let currentQuestionIndex = 0;
+        const responses = {};
+
+        // 元素引用
+        const infoSection = document.getElementById('infoSection');
+        const questionSection = document.getElementById('questionSection');
+        const resultSection = document.getElementById('resultSection');
+        const questionContainer = document.getElementById('questionContainer');
+        const prevQuestionBtn = document.getElementById('prevQuestionBtn');
+        const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+        const resultContent = document.getElementById('resultContent');
+
+        // 歷史模態框元素
+        const historyModal = document.getElementById('historyModal');
+        const historyList = document.getElementById('historyList');
+
+        // 結果存儲鍵
+        const STORAGE_KEY = 'fragrancePersonalityResults';
+
+        // 測試開始按鈕事件
+        document.getElementById('startTestBtn').addEventListener('click', () => {
+            const userName = document.getElementById('userName').value.trim();
+            if (!userName) {
+                alert('請輸入姓名後再開始測評！');
+                return;
+            }
+            // 初始化
+            currentQuestionIndex = 0;
+            Object.keys(responses).forEach(key => delete responses[key]);
+            infoSection.classList.add('hidden');
+            questionSection.classList.remove('hidden');
+            renderQuestion();
+        });
+
+        // 查看歷史按鈕事件
+        document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+            loadHistory();
+            historyModal.classList.remove('hidden');
+        });
+
+        // 關閉歷史模態框
+        document.getElementById('closeHistoryBtn').addEventListener('click', () => {
+            historyModal.classList.add('hidden');
+        });
+
+        // 清空歷史
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            if (confirm('確定要清空所有歷史紀錄嗎？')) {
+                localStorage.removeItem(STORAGE_KEY);
+                loadHistory();
+            }
+        });
+
+        // 問卷上一題按鈕
+        prevQuestionBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        // 問卷下一題按鈕
+        nextQuestionBtn.addEventListener('click', () => {
+            const current = questions[currentQuestionIndex];
+            const selected = document.querySelector('input[name="q' + current.id + '"]:checked');
+            if (!selected) {
+                alert('請選擇一個選項後再繼續！');
+                return;
+            }
+            responses[current.dimension] = parseInt(selected.value);
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                // 完成問卷
+                showResult();
+            }
+        });
+
+        // 渲染當前問題
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+            questionContainer.innerHTML = `
+                <div class="mb-4">
+                    <span class="text-sm font-medium text-gray-500">問題 ${currentQuestionIndex + 1}/${questions.length}</span>
+                </div>
+                <h3 class="text-lg font-semibold mb-4 text-gray-800">${q.text}</h3>
+                <div class="space-y-3">
+                    ${[1,2,3,4,5].map(value => `
+                        <label class="flex items-center space-x-3">
+                            <input type="radio" name="q${q.id}" value="${value}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span class="text-gray-700">${value === 1 ? '非常不同意' : value === 2 ? '不同意' : value === 3 ? '中立' : value === 4 ? '同意' : '非常同意'}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            `;
+            // 更新按鈕狀態
+            prevQuestionBtn.disabled = currentQuestionIndex === 0;
+            nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '提交測評' : '下一題';
+        }
+
+  // 顯示結果
+        function showResult() {
+            questionSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+
+            // --- START: 修正後的程式碼 ---
+            // 修正問題：處理同分情況，避免每次結果都相同。
+            // 原始碼在遇到多個最高分時，總是選擇列表中的第一個，導致結果重複。
+            // 新的邏輯會找出所有最高分的選項，然後從中隨機選擇一個作為結果。
+
+            // 1. 從所有回答中找出最高分是多少
+            const bestScore = Math.max(...Object.values(responses));
+            
+            // 2. 找出所有得到這個最高分的人格維度
+            const tiedDimensions = Object.keys(responses).filter(dim => responses[dim] === bestScore);
+            
+            // 3. 從同分的維度中隨機選擇一個作為最終結果
+            const bestDim = tiedDimensions[Math.floor(Math.random() * tiedDimensions.length)];
+            // --- END: 修正後的程式碼 ---
+
+            const result = personalityData[bestDim];
+            
+            // 保存當次評測資料
+            const userName = document.getElementById('userName').value.trim();
+            const userPhone = document.getElementById('userPhone').value.trim();
+            const userNote = document.getElementById('userNote').value.trim();
+            const timestamp = new Date().toISOString();
+            const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, details: result };
+            
+            // 渲染結果
+            renderResultCard(resultObject);
+            
+            // 設置保存事件
+            document.getElementById('saveResultBtn').onclick = () => saveResult(resultObject);
+            
+            // 設置導出事件
+            document.getElementById('exportPdfBtn').onclick = () => exportReport(resultObject);
+            
+            // 設置重新測評
+            document.getElementById('restartBtn').onclick = () => {
+                resultSection.classList.add('hidden');
+                infoSection.classList.remove('hidden');
+            };
+        }
+
+        // 渲染結果卡片
+        function renderResultCard(resultObject) {
+            const res = resultObject.details;
+            resultContent.innerHTML = `
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">受測者：${resultObject.userName}</h3>
+                    <p class="text-sm text-gray-600 mt-1">測評時間：${new Date(resultObject.timestamp).toLocaleString()}</p>
+                </div>
+                <div class="border rounded-xl p-6 card-shadow">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full mr-3" style="background-color: ${res.colorHex};"></div>
+                        <h2 class="text-xl font-bold text-gray-800 flex-1">${res.code} ${res.name}</h2>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">特質：</span>${res.traits}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">香氛調：</span>${res.scentType}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">精油配方：</span>${res.essentialOilFormula}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">精油香氛名稱：</span>${res.essentialOilName}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">香水配方：</span>${res.perfumeFormula}</p>
+                    <p class="text-sm text-gray-600 mb-4"><span class="font-medium">香水香氛名稱：</span>${res.perfumeName}</p>
+                    <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+                        <div><span class="font-medium">對應色名：</span>${res.colorName}</div>
+                        <div><span class="font-medium">HEX：</span>${res.colorHex}</div>
+                        <div><span class="font-medium">六合屬性：</span>${res.liuhe}</div>
+                        <div><span class="font-medium">人體系統：</span>${res.bodySystem}</div>
+                        <div><span class="font-medium">對應情緒：</span>${res.emotion}</div>
+                        <div><span class="font-medium">音屬性：</span>${res.sound}</div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">香氛寓意：</span>${res.scentMeaning}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">健康提醒：</span>${res.healthTips}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">健康屬性：</span>${res.healthBenefit}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">支派：</span>${res.tribe}</p>
+                    <p class="text-sm text-gray-600 mb-2"><span class="font-medium">祝福線索：</span>${res.blessingClue}</p>
+                    <p class="text-sm text-gray-500"><span class="font-medium">經文：</span>${res.scripture}</p>
+                </div>
+            `;
+        }
+
+        // 保存結果到 localStorage
+        function saveResult(obj) {
+            let results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            results.push(obj);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+            alert('結果已保存！');
+            loadHistory();
+        }
+
+        // 讀取歷史並渲染
+        function loadHistory() {
+            historyList.innerHTML = '';
+            const results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            if (results.length === 0) {
+                historyList.innerHTML = '<p class="text-center text-gray-500">暫無測評記錄</p>';
+                return;
+            }
+            results.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'border rounded-lg p-4 mb-3 hover:bg-gray-50 cursor-pointer';
+                div.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="font-medium text-gray-800">${item.userName}</p>
+                            <p class="text-xs text-gray-500">${new Date(item.timestamp).toLocaleString()}</p>
+                        </div>
+                        <div class="text-blue-600 text-sm font-medium">${item.type}</div>
+                    </div>
+                `;
+                div.addEventListener('click', () => {
+                    // 點擊查看詳情
+                    historyModal.classList.add('hidden');
+                    infoSection.classList.add('hidden');
+                    questionSection.classList.add('hidden');
+                    resultSection.classList.remove('hidden');
+                    renderResultCard(item);
+                    // 重新綁定按鈕以保存不同對象
+                    document.getElementById('saveResultBtn').onclick = () => saveResult(item);
+                    document.getElementById('exportPdfBtn').onclick = () => exportReport(item);
+                    document.getElementById('restartBtn').onclick = () => {
+                        resultSection.classList.add('hidden');
+                        infoSection.classList.remove('hidden');
+                    };
+                });
+                historyList.appendChild(div);
+            });
+        }
+
+        // 導出報告為 PDF
+        async function exportReport(obj) {
+            const element = document.getElementById('resultSection');
+            const canvas = await html2canvas(element, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jspdf.jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let position = 0;
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            if (imgHeight > pageHeight) {
+                while (position + pageHeight < imgHeight) {
+                    position += pageHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
+                }
+            }
+            pdf.save(`${obj.userName}_${obj.type}_香氛人格報告.pdf`);
+        }
+    </script>
+</body>
+</html>
