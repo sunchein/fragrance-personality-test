@@ -566,12 +566,38 @@
             `;
         }
 
-        function saveResult(obj) {
-            let results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-            results.push(obj);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
-            console.log('結果已自動保存至 LocalStorage！', obj);
+        // ===== START: MODIFIED SECTION =====
+function saveResult(obj) {
+    // 【第 1 步】：將您剛剛從 Google Apps Script 複製的網址，貼到下面的引號中
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoVUFuBX__5fabogWhegm-_alMOcgSZ9CTSwFJoRue4fc6UMpo49xFnt4OsKU6jJ2pkA/exec";
+
+    // 第 2 步 (可選)：仍然在瀏覽器中為使用者保留一份歷史紀錄
+    let localResults = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    localResults.push(obj);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(localResults));
+    console.log('結果已自動保存至 LocalStorage！', obj);
+
+    // 第 3 步：使用 fetch 將資料發送到 Google Apps Script
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(obj),
+        headers: {
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === 'success') {
+            console.log("成功寫入 Google Sheet，資料位於第 " + data.row + " 列。");
+        } else {
+            console.error("寫入 Google Sheet 失敗:", data.message);
+        }
+    })
+    .catch(error => {
+        console.error('發送到 Google Sheet 時發生網路錯誤:', error);
+    });
+}
+// ===== END: MODIFIED SECTION =====
 
         function loadHistory() {
             historyList.innerHTML = '';
