@@ -113,8 +113,8 @@
                 ...{
                     traits: "果斷、權威、目標導向",
                     scentType: "木質辛香調",
-                    essentialOilFormula: "黑胡椒+肉桂皮+雪松+佛手柑+檸檬",
-                    essentialOilName: "赤焰初心",
+                    essentialOilFormula: "黑胡椒20% + 肉桂皮15% + 薑20% + 佛手柑25% + 檸檬20%",
+                    essentialOilName: "赤焰之力",
                     perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草",
                     perfumeName: "王者脈動",
                     colorName: "赤炎色",
@@ -136,7 +136,7 @@
                 name: "合作者 (Collaborator)",
                 traits: "親和、包容、溫暖",
                 scentType: "白花麝香調",
-                essentialOilFormula: "甜橙+ 西班牙天竺葵 + 薰衣草 + 安息香",
+                essentialOilFormula: "甜橙35% + 西班牙天竺葵25% + 薰衣草20% + 安息香20%",
                 essentialOilName: "晨曦擁抱",
                 perfumeFormula: "前：橘子花/檸檬 | 中：玫瑰/天竺葵 | 後：檀香/琥珀",
                 perfumeName: "光之和諧",
@@ -150,7 +150,7 @@
                 healthTips: "情緒敏感，需注意心血管系統，避免過度為他人犧牲導致心力耗損。",
                 healthBenefit: "神經系統，舒緩焦慮，提升情感連結；需注意心血管與心包經健康。",
                 tribe: "西緬",
-                blessingClue: "祭司職分、教導律法、事奉",
+                blessingClue: "看哪，有子如水不穩→求存活而不減少",
                 scripture: "創世記 49:5-7"
             },
             creator: {
@@ -216,7 +216,7 @@
                 healthTips: "好奇心強但易缺耐心，需注意膀胱經與水液代謝，避免腰背酸痛。",
                 healthBenefit: "呼吸系統，清新暢通，帶來冒險能量；需注意膀胱經與水液代謝。",
                 tribe: "西布倫",
-                blessingClue: "被追擊仍反勝、戰士性格""為民伸冤、機警如蛇、小獅子",
+                blessingClue: "被追擊仍反勝、戰士性格",
                 scripture: "創世記 49:13"
             },
             guardian: {
@@ -237,8 +237,8 @@
                 scentMeaning: "保護與忠誠",
                 healthTips: "可能過度擔憂、犧牲自我，需注意脾胃與氣血生成。",
                 healthBenefit: "免疫系統，鎮靜安定，守護身心；需注意脾胃與氣血生成，避免過度思慮。",
-                tribe: "呂便",
-                blessingClue: "與利未同被分散、需轉化烈性""看哪，有子如水不穩→求存活而不減少",
+                tribe: "呂變",
+                blessingClue: "與利未同被分散、需轉化烈性",
                 scripture: "創世記 49:3-4"
             },
             explorer: {
@@ -411,13 +411,21 @@
         // 結果存儲鍵
         const STORAGE_KEY = 'fragrancePersonalityResults';
 
+        // ===== START: MODIFIED SECTION =====
         // 測試開始按鈕事件
         document.getElementById('startTestBtn').addEventListener('click', () => {
             const userName = document.getElementById('userName').value.trim();
+            const userPhone = document.getElementById('userPhone').value.trim();
+
             if (!userName) {
                 alert('請輸入姓名後再開始測評！');
                 return;
             }
+            if (!userPhone) {
+                alert('請輸入電話後再開始測評！');
+                return;
+            }
+
             // 初始化
             currentQuestionIndex = 0;
             Object.keys(responses).forEach(key => delete responses[key]);
@@ -425,6 +433,7 @@
             questionSection.classList.remove('hidden');
             renderQuestion();
         });
+        // ===== END: MODIFIED SECTION =====
         
         // 查看歷史按鈕事件，增加密碼驗證
         document.getElementById('viewHistoryBtn').addEventListener('click', () => {
@@ -519,10 +528,8 @@
             const timestamp = new Date().toISOString();
             const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, details: result };
 
-            // ===== START: MODIFIED SECTION =====
             // 立即自動保存結果
             saveResult(resultObject);
-            // ===== END: MODIFIED SECTION =====
 
             // 渲染結果
             renderResultCard(resultObject);
@@ -584,7 +591,6 @@
             `;
         }
 
-        // ===== START: MODIFIED SECTION =====
         // 保存結果到 localStorage (移除 alert)
         function saveResult(obj) {
             let results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -592,7 +598,6 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
             console.log('結果已自動保存！', obj); // 在控制台打印日誌，方便調試
         }
-        // ===== END: MODIFIED SECTION =====
 
         // 讀取歷史並渲染
         function loadHistory() {
