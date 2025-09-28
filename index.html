@@ -103,33 +103,31 @@
             </div>
         </div>
     </div>
-    
+
     <script>
         // 初始化十二型人格資料
         const personalityData = {
             leader: {
                 code: "01",
                 name: "領導者 (Leader)",
-                ...{
-                    traits: "果斷、權威、目標導向",
-                    scentType: "木質辛香調",
-                    essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬",
-                    essentialOilName: "赤焰初心",
-                    perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草",
-                    perfumeName: "王者脈動",
-                    colorName: "赤炎色",
-                    colorHex: "#FF4500",
-                    liuhe: "陽火",
-                    bodySystem: "循環系統",
-                    emotion: "驕傲 / 榮耀（正向自信）",
-                    sound: "陽宮音",
-                    scentMeaning: "帶領與決斷力",
-                    healthTips: "需要注意膽的疏泄功能，壓力大或作息不規律可能影響決斷力，易有偏頭痛、失眠問題。",
-                    healthBenefit: "心血管系統，強化循環，提升決斷力；需注意膽經，避免熬夜導致偏頭痛、失眠。",
-                    tribe: "猶大",
-                    blessingClue: "君王血脈，萬民歸順。祝福預言君王的權杖永不離開猶大，他將如同獅子般勇猛，統治並受萬民敬仰。彌賽亞將從此而出。 (創49:8-10)",
-                    scripture: "創世記 49:8-10"
-                }
+                traits: "果斷、權威、目標導向",
+                scentType: "木質辛香調",
+                essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬",
+                essentialOilName: "赤焰初心",
+                perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草",
+                perfumeName: "王者脈動",
+                colorName: "赤炎色",
+                colorHex: "#FF4500",
+                liuhe: "陽火",
+                bodySystem: "循環系統",
+                emotion: "驕傲 / 榮耀（正向自信）",
+                sound: "陽宮音",
+                scentMeaning: "帶領與決斷力",
+                healthTips: "需要注意膽的疏泄功能，壓力大或作息不規律可能影響決斷力，易有偏頭痛、失眠問題。",
+                healthBenefit: "心血管系統，強化循環，提升決斷力；需注意膽經，避免熬夜導致偏頭痛、失眠。",
+                tribe: "猶大",
+                blessingClue: "君王血脈，萬民歸順。祝福預言君王的權杖永不離開猶大，他將如同獅子般勇猛，統治並受萬民敬仰。彌賽亞將從此而出。 (創49:8-10)",
+                scripture: "創世記 49:8-10"
             },
             collaborator: {
                 code: "02",
@@ -225,7 +223,7 @@
                 traits: "忠誠、保護、安定",
                 scentType: "草本花香木質調",
                 essentialOilFormula: "乳香 + 絲柏 + 薰衣草 + 安息香",
-                essentialOilName: "靛藍搖籃曲"
+                essentialOilName: "靛藍搖籃曲",
                 perfumeFormula: "前：薰衣草/佛手柑 | 中：乳香/沒藥 | 後：岩蘭草/沉香",
                 perfumeName: "忠誠之盾",
                 colorName: "靛藍色",
@@ -327,7 +325,7 @@
                 healthBenefit: "腦神經與呼吸，開啟洞察與靈感；需注意腎精與記憶力，避免過勞。",
                 tribe: "拿弗他利",
                 blessingClue: "自由釋放，言語嘉美。被形容為「被釋放的母鹿」，充滿自由、敏捷與優雅的生命力。他能「出嘉美的言語」，具有啟發人心、帶來盼望的溝通能力。 (創49:21)",
-                scripture: "創世記 49:27"
+                scripture: "創世記 49:21"
             },
             architect: {
                 code: "11",
@@ -391,7 +389,7 @@
             { id: 12, text: "我渴望啟迪他人靈魂，追求智慧與聖潔的生活。", dimension: "soulMentor" }
         ];
 
-       // 問卷流程控制變量
+        // 問卷流程控制變量
         let currentQuestionIndex = 0;
         const responses = {};
 
@@ -411,7 +409,6 @@
         // 結果存儲鍵
         const STORAGE_KEY = 'fragrancePersonalityResults';
 
-        // ===== START: MODIFIED SECTION =====
         // 測試開始按鈕事件
         document.getElementById('startTestBtn').addEventListener('click', () => {
             const userName = document.getElementById('userName').value.trim();
@@ -433,27 +430,22 @@
             questionSection.classList.remove('hidden');
             renderQuestion();
         });
-        // ===== END: MODIFIED SECTION =====
         
         // 查看歷史按鈕事件，增加密碼驗證
         document.getElementById('viewHistoryBtn').addEventListener('click', () => {
-            // 跳出一個輸入框，要求使用者輸入密碼
             const password = prompt("請輸入管理員密碼：");
-            // 檢查密碼是否正確
             if (password === "sun20020503") {
                 loadHistory();
                 historyModal.classList.remove('hidden');
-            } else if (password !== null) { // 如果使用者不是按取消
+            } else if (password !== null) {
                 alert('密碼錯誤！');
             }
         });
 
-        // 關閉歷史模態框
         document.getElementById('closeHistoryBtn').addEventListener('click', () => {
             historyModal.classList.add('hidden');
         });
 
-        // 清空歷史
         document.getElementById('clearHistoryBtn').addEventListener('click', () => {
             if (confirm('確定要清空所有歷史紀錄嗎？')) {
                 localStorage.removeItem(STORAGE_KEY);
@@ -461,7 +453,6 @@
             }
         });
 
-        // 問卷上一題按鈕
         prevQuestionBtn.addEventListener('click', () => {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
@@ -469,7 +460,6 @@
             }
         });
 
-        // 問卷下一題按鈕
         nextQuestionBtn.addEventListener('click', () => {
             const current = questions[currentQuestionIndex];
             const selected = document.querySelector('input[name="q' + current.id + '"]:checked');
@@ -482,12 +472,10 @@
                 currentQuestionIndex++;
                 renderQuestion();
             } else {
-                // 完成問卷
                 showResult();
             }
         });
 
-        // 渲染當前問題
         function renderQuestion() {
             const q = questions[currentQuestionIndex];
             questionContainer.innerHTML = `
@@ -504,57 +492,44 @@
                     `).join('')}
                 </div>
             `;
-            // 更新按鈕狀態
             prevQuestionBtn.disabled = currentQuestionIndex === 0;
             nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '提交測評' : '下一題';
         }
 
-        // 顯示結果
         function showResult() {
             questionSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
 
-            // 處理同分情況，避免每次結果都相同
             const bestScore = Math.max(...Object.values(responses));
             const tiedDimensions = Object.keys(responses).filter(dim => responses[dim] === bestScore);
             const bestDim = tiedDimensions[Math.floor(Math.random() * tiedDimensions.length)];
-
             const result = personalityData[bestDim];
 
-            // 保存當次評測資料
             const userName = document.getElementById('userName').value.trim();
             const userPhone = document.getElementById('userPhone').value.trim();
             const userNote = document.getElementById('userNote').value.trim();
             const timestamp = new Date().toISOString();
             const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, details: result };
 
-            // 立即自動保存結果
             saveResult(resultObject);
-
-            // 渲染結果
             renderResultCard(resultObject);
 
-            // 設置保存事件 (此按鈕現在變為可選的，因為已經自動保存了)
             document.getElementById('saveResultBtn').onclick = () => {
                 saveResult(resultObject);
-                alert('結果已再次保存！'); // 可以給一個不同的提示
+                alert('結果已再次保存！');
             };
 
-            // 設置導出事件
             document.getElementById('exportPdfBtn').onclick = () => exportReport(resultObject);
 
-            // 設置重新測評事件，並清空姓名欄位
             document.getElementById('restartBtn').onclick = () => {
                 resultSection.classList.add('hidden');
                 infoSection.classList.remove('hidden');
-                // 清空姓名輸入框
                 document.getElementById('userName').value = '';
                 document.getElementById('userPhone').value = '';
                 document.getElementById('userNote').value = '';
             };
         }
 
-        // 渲染結果卡片
         function renderResultCard(resultObject) {
             const res = resultObject.details;
             resultContent.innerHTML = `
@@ -591,15 +566,13 @@
             `;
         }
 
-        // 保存結果到 localStorage (移除 alert)
         function saveResult(obj) {
             let results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
             results.push(obj);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
-            console.log('結果已自動保存！', obj); // 在控制台打印日誌，方便調試
+            console.log('結果已自動保存至 LocalStorage！', obj);
         }
 
-        // 讀取歷史並渲染
         function loadHistory() {
             historyList.innerHTML = '';
             const results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -607,8 +580,8 @@
                 historyList.innerHTML = '<p class="text-center text-gray-500">暫無測評記錄</p>';
                 return;
             }
-            results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // 讓最新的紀錄顯示在最上面
-            results.forEach((item, index) => {
+            results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            results.forEach((item) => {
                 const div = document.createElement('div');
                 div.className = 'border rounded-lg p-4 mb-3 hover:bg-gray-50 cursor-pointer';
                 div.innerHTML = `
@@ -621,13 +594,11 @@
                     </div>
                 `;
                 div.addEventListener('click', () => {
-                    // 點擊查看詳情
                     historyModal.classList.add('hidden');
                     infoSection.classList.add('hidden');
                     questionSection.classList.add('hidden');
                     resultSection.classList.remove('hidden');
                     renderResultCard(item);
-                    // 重新綁定按鈕
                     document.getElementById('saveResultBtn').onclick = () => {
                         saveResult(item);
                         alert('結果已再次保存！');
@@ -645,22 +616,13 @@
             });
         }
 
-        // 導出報告為 PDF
         async function exportReport(obj) {
             const { jsPDF } = window.jspdf;
             const element = document.getElementById('resultContent');
-            
-            // 為了讓PDF截圖更完整，暫時移除box-shadow
+
             element.classList.remove('card-shadow');
-
-            const canvas = await html2canvas(element, { 
-                scale: 2,
-                useCORS: true 
-            });
-
-            // 恢復box-shadow
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
             element.classList.add('card-shadow');
-
             const imgData = canvas.toDataURL('image/png');
             
             const pdf = new jsPDF({
