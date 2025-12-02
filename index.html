@@ -16,13 +16,20 @@
             backdrop-filter: blur(3px);
         }
     </style>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans leading-relaxed">
     <form name="test-results" netlify netlify-honeypot="bot-field" hidden>
       <input type="text" name="userName" />
       <input type="text" name="userPhone" />
       <input type="text" name="userNote" />
-      <input type="text" name="resultType" />
+      <input type="text" name="resultType" /><input type="text" name="lineUserId" />
+<input type="text" name="lineDisplayName" />
+<input type="text" name="linePictureUrl" />
+<input type="text" name="resultCode" />
+<input type="text" name="resultKey" />
+<input type="text" name="timestamp" />
+
     </form>
     <div class="container mx-auto px-4 py-6">
         <header class="mb-8 text-center">
@@ -34,6 +41,9 @@
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <i class="fa fa-address-card mr-3 text-blue-600"></i>受測者資訊
             </h2>
+            <div id="lineStatus" class="mb-4 text-sm text-gray-700 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                尚未登入 LINE（請按下下方按鈕登入後開始測評）
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-red-500">*</span></label>
@@ -111,6 +121,54 @@
     </div>
 
     <script>
+// ===== LINE LIFF Login START =====
+// 1) 你需要到 LINE Developers 建立 LIFF App，取得你的 LIFF ID，填在這裡：
+const LIFF_ID = "2008610266-8jDqPJAe";
+
+// LINE 個人資料（登入成功後會填入）
+let lineProfile = null;
+
+function setLineStatus(text, isError = false) {
+    const el = document.getElementById('lineStatus');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.toggle('bg-red-50', isError);
+    el.classList.toggle('border-red-100', isError);
+    el.classList.toggle('text-red-700', isError);
+}
+
+async function initLine() {
+    // 如果你尚未設定 LIFF_ID，就不要初始化，避免噴錯干擾展場
+    if (!LIFF_ID || LIFF_ID === "YOUR_LIFF_ID") {
+        setLineStatus("尚未設定 LIFF_ID（請先在 LINE Developers 建立 LIFF，並把 LIFF_ID 填入程式）。", true);
+        return false;
+    }
+
+    try {
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+
+        if (!liff.isLoggedIn()) {
+            setLineStatus("尚未登入 LINE（按下按鈕後將引導登入）。");
+            return false;
+        }
+
+        lineProfile = await liff.getProfile();
+        setLineStatus(`已登入：${lineProfile.displayName}`);
+
+        // 自動帶入姓名（仍可手動更改）
+        const nameInput = document.getElementById('userName');
+        if (nameInput && !nameInput.value.trim()) {
+            nameInput.value = lineProfile.displayName || "";
+        }
+        return true;
+    } catch (err) {
+        console.error("LIFF init/getProfile error:", err);
+        setLineStatus("LINE 登入初始化失敗：請確認 LIFF_ID、Endpoint URL 與網域設定。", true);
+        return false;
+    }
+}
+// ===== LINE LIFF Login END =====
+
         const personalityData = {
             leader: { code: "01", name: "領導者 (Leader)", traits: "果斷、權威、目標導向", scentType: "木質辛香調", essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬", essentialOilName: "赤焰初心", perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草", perfumeName: "王者脈動", colorName: "赤炎色", colorHex: "#FF4500", liuhe: "陽火", bodySystem: "循環系統", emotion: "驕傲 / 榮耀（正向自信）", sound: "陽宮音", scentMeaning: "帶領與決斷力", healthTips: "需要注意膽的疏泄功能，壓力大或作息不規律可能影響決斷力，易有偏頭痛、失眠問題。", healthBenefit: "心血管系統，強化循環，提升決斷力；需注意膽經，避免熬夜導致偏頭痛、失眠。", tribe: "猶大", blessingClue: "君王血脈，萬民歸順。祝福預言君王的權杖永不離開猶大，他將如同獅子般勇猛，統治並受萬民敬仰。彌賽亞將從此而出。 (創49:8-10)", scripture: "創世記 49:8-10" },
             collaborator: { code: "02", name: "合作者 (Collaborator)", traits: "親和、包容、溫暖", scentType: "白花麝香調", essentialOilFormula: "甜橙 + 西班牙天竺葵 + 薰衣草 + 安息香", essentialOilName: "晨曦擁抱", perfumeFormula: "前：橘子花/檸檬 | 中：玫瑰/天竺葵 | 後：檀香/琥珀", perfumeName: "光之和諧", colorName: "橙曦色", colorHex: "#FFA500", liuhe: "陰木", bodySystem: "神經系統", emotion: "信任 / 安心", sound: "陰羽音", scentMeaning: "溫暖包容", healthTips: "情緒敏感，需注意心血管系統，避免過度為他人犧牲導致心力耗損。", healthBenefit: "神經系統，舒緩焦慮，提升情感連結；需注意心血管與心包經健康。", tribe: "西緬", blessingClue: "分散聯合，融入各支派。名字意為「聽見」。因其暴戾，祝福（亦是咒詛）是要分散在以色列各家之中，這使得他們必須與其他支派合作共存才能立足。 (創49:5-7)", scripture: "創世記 49:5-7" },
@@ -143,17 +201,40 @@
         const historyList = document.getElementById('historyList');
         const STORAGE_KEY = 'fragrancePersonalityResults';
 
-        document.getElementById('startTestBtn').addEventListener('click', () => {
-            const userName = document.getElementById('userName').value.trim();
-            const userPhone = document.getElementById('userPhone').value.trim();
-            if (!userName) { alert('請輸入姓名後再開始測評！'); return; }
-            if (!userPhone) { alert('請輸入電話後再開始測評！'); return; }
-            currentQuestionIndex = 0;
-            Object.keys(responses).forEach(key => delete responses[key]);
-            infoSection.classList.add('hidden');
-            questionSection.classList.remove('hidden');
-            renderQuestion();
-        });
+        document.getElementById('startTestBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // 初始化 LIFF（若尚未登入，會顯示狀態）
+    const ok = await initLine();
+
+    // 外部瀏覽器 / LINE 內建瀏覽器：未登入就導向登入
+    if (window.liff && !liff.isLoggedIn()) {
+        // 注意：在 LIFF browser（LINE 內）通常 init 時會自動登入；外部則需要 login()。
+        // 若開在外部瀏覽器，withLoginOnExternalBrowser: true 會自動登入；仍保留保險。
+        try {
+            liff.login({ redirectUri: window.location.href });
+            return;
+        } catch (err) {
+            alert('請使用 LINE 開啟此測評（或允許登入權限）');
+            return;
+        }
+    }
+
+    // 允許沒有 LIFF（例如暫時沒上線）時仍能用手填方式做測評
+    const userName = document.getElementById('userName').value.trim();
+    const userPhone = document.getElementById('userPhone').value.trim();
+
+    if (!userName) { alert('請輸入姓名後再開始測評！'); return; }
+    // 電話改為非必填（展場體驗較順），若你仍想必填，把下一行註解拿掉即可
+    // if (!userPhone) { alert('請輸入電話後再開始測評！'); return; }
+
+    currentQuestionIndex = 0;
+    Object.keys(responses).forEach(key => delete responses[key]);
+    infoSection.classList.add('hidden');
+    questionSection.classList.remove('hidden');
+    renderQuestion();
+});
+
         
         document.getElementById('viewHistoryBtn').addEventListener('click', () => {
             const password = prompt("請輸入管理員密碼：");
@@ -214,7 +295,7 @@
             const userPhone = document.getElementById('userPhone').value.trim();
             const userNote = document.getElementById('userNote').value.trim();
             const timestamp = new Date().toISOString();
-            const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, details: result };
+            const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, resultCode: result.code, resultKey: bestDim, line: lineProfile, details: result };
             saveResult(resultObject);
             renderResultCard(resultObject);
             document.getElementById('saveResultBtn').onclick = () => { saveResult(resultObject); alert('結果已再次保存！'); };
@@ -242,7 +323,13 @@
                 'userName': obj.userName,
                 'userPhone': obj.userPhone,
                 'userNote': obj.userNote,
-                'resultType': obj.type
+                'resultType': obj.type,
+                'resultCode': obj.resultCode || '',
+                'resultKey': obj.resultKey || '',
+                'timestamp': obj.timestamp || '',
+                'lineUserId': (obj.line && obj.line.userId) ? obj.line.userId : '',
+                'lineDisplayName': (obj.line && obj.line.displayName) ? obj.line.displayName : '',
+                'linePictureUrl': (obj.line && obj.line.pictureUrl) ? obj.line.pictureUrl : ''
             };
             
             // 使用 fetch 將資料發送到 Netlify
