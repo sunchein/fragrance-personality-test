@@ -19,7 +19,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen font-sans leading-relaxed">
-    <!-- Netlify Form -->
+    <!-- Netlify Form (用於資料收集) -->
     <form name="test-results" netlify netlify-honeypot="bot-field" hidden>
       <input type="text" name="userName" />
       <input type="text" name="userPhone" />
@@ -36,9 +36,10 @@
     <div class="container mx-auto px-4 py-6">
         <header class="mb-8 text-center">
             <h1 class="text-3xl font-extrabold text-gray-800 mb-2">十二香氛人格測評系統</h1>
-            <p class="text-gray-600">根據十二型香氛人格理論與12支派 為您定製專屬香氛建議。</p>
+            <p class="text-gray-600 text-sm">根據十二型香氛人格理論與12支派 為您定製專屬香氛建議。</p>
         </header>
 
+        <!-- 資訊與登入區塊 -->
         <section id="infoSection" class="bg-white p-6 rounded-xl card-shadow mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <i class="fa fa-address-card mr-3 text-blue-600"></i>受測者資訊
@@ -48,47 +49,51 @@
             </div>
             <div id="lineProfileCard" class="hidden mb-4 border border-gray-100 rounded-xl p-4 bg-white">
               <div class="flex items-center gap-3">
-                <img id="lineAvatar" alt="LINE avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200" />
+                <img id="lineAvatar" alt="LINE avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm" src="" />
                 <div>
-                  <div class="text-sm text-gray-500">已登入 LINE</div>
+                  <div class="text-xs text-gray-400 font-medium">已連結 LINE 帳號</div>
                   <div id="lineDisplayNameText" class="text-base font-semibold text-gray-800"></div>
                 </div>
               </div>
             </div>
 
-            <div id="contactFields" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div id="contactFields" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名（由 LINE 自動帶入）</label>
-                    <input id="userName" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="LINE 登入後自動帶入">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">姓名 (由 LINE 自動帶入)</label>
+                    <input id="userName" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="載入姓名中...">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">電話（選填）</label>
-                    <input id="userPhone" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">聯絡電話 (選填)</label>
+                    <input id="userPhone" type="tel" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="以便提供後續建議">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
-                    <input id="userNote" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">備註 (選填)</label>
+                    <input id="userNote" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可填寫額外需求">
                 </div>
             </div>
-            <div class="flex flex-wrap gap-3">
-                <button id="startTestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
-                    <i class="fa fa-play mr-2"></i>開始測評
+            
+            <div class="flex flex-col gap-3">
+                <button id="startTestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-full transition-all duration-300 shadow-lg flex items-center justify-center gap-2">
+                    <i class="fa fa-play"></i> 開始測評
                 </button>
-                <button id="viewHistoryBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
-                    <i class="fa fa-history mr-2"></i>管理員歷史紀錄
+                <button id="viewHistoryBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium py-3 rounded-full transition-all duration-300 flex items-center justify-center gap-2 text-sm">
+                    <i class="fa fa-history"></i> 管理員歷史紀錄
                 </button>
             </div>
         </section>
 
         <!-- 問卷區塊 -->
         <section id="questionSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
-            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fa fa-question-circle mr-3 text-blue-600"></i>人格測評問卷
-            </h2>
-            <div id="questionContainer" class="mb-6"></div>
-            <div class="flex justify-between items-center">
-                <button id="prevQuestionBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full" disabled>上一題</button>
-                <button id="nextQuestionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-full">下一題</button>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i class="fa fa-question-circle mr-3 text-blue-600"></i>人格測評問卷
+                </h2>
+                <span id="progressText" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">1 / 12</span>
+            </div>
+            <div id="questionContainer" class="mb-8"></div>
+            <div class="flex gap-4">
+                <button id="prevQuestionBtn" class="flex-1 bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 rounded-full disabled:opacity-30">上一題</button>
+                <button id="nextQuestionBtn" class="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-full shadow-md">下一題</button>
             </div>
         </section>
 
@@ -96,17 +101,14 @@
         <section id="resultSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
             <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fa fa-star mr-3 text-blue-600"></i>測評結果
+                    <i class="fa fa-star mr-3 text-blue-600"></i>您的測評結果
                 </h2>
                 <div class="flex flex-wrap gap-2">
-                    <button id="saveResultBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-full">
-                        <i class="fa fa-save mr-2"></i>保存結果
+                    <button id="exportPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-full shadow">
+                        <i class="fa fa-file-pdf-o mr-1"></i>PDF 報告
                     </button>
-                    <button id="exportPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-full">
-                        <i class="fa fa-file-pdf-o mr-2"></i>導出報告
-                    </button>
-                    <button id="restartBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full">
-                        <i class="fa fa-refresh mr-2"></i>重新測評
+                    <button id="restartBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full shadow">
+                        <i class="fa fa-refresh mr-1"></i>重新測評
                     </button>
                 </div>
             </div>
@@ -114,19 +116,19 @@
         </section>
 
         <!-- 歷史紀錄 Modal -->
-        <div id="historyModal" class="fixed inset-0 bg-black/50 modal-backdrop hidden flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+        <div id="historyModal" class="fixed inset-0 bg-black/60 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
                 <div class="p-6 border-b flex justify-between items-center bg-gray-50">
                     <h3 class="text-xl font-bold text-gray-800">所有受測者紀錄分析</h3>
-                    <button id="closeHistoryBtn" class="text-gray-500 hover:text-gray-700">
-                        <i class="fa fa-times text-xl"></i>
+                    <button id="closeHistoryBtn" class="text-gray-500 hover:text-gray-700 p-2">
+                        <i class="fa fa-times text-2xl"></i>
                     </button>
                 </div>
-                <div id="historyList" class="overflow-y-auto flex-grow p-6 bg-gray-50/50">
-                    <!-- 歷史項目將由 JS 注入 -->
+                <div id="historyList" class="overflow-y-auto flex-grow p-6 bg-gray-50/50 space-y-4">
+                    <!-- 歷史項目注入處 -->
                 </div>
                 <div class="p-4 border-t bg-white flex justify-between items-center">
-                    <span class="text-xs text-gray-400 font-medium">* 點擊紀錄可重新查看完整報告</span>
+                    <span class="text-xs text-gray-400 font-medium">* 顯示所有在線測試資料</span>
                     <button id="clearHistoryBtn" class="text-red-600 hover:text-red-700 text-sm font-bold px-4 py-2 border border-red-100 rounded-lg hover:bg-red-50">
                         <i class="fa fa-trash mr-1"></i>清空所有紀錄
                     </button>
@@ -136,7 +138,7 @@
     </div>
 
     <script>
-// ===== LINE LIFF Login =====
+// ===== LINE LIFF 設定 =====
 const LIFF_ID = "2008610266-8jDqPJAe";
 let lineProfile = null;
 let isLiffInit = false;
@@ -163,21 +165,27 @@ async function initLine() {
     try {
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
         isLiffInit = true;
+        
         if (!liff.isLoggedIn()) {
-            setLineStatus("尚未登入 LINE（請點擊按鈕開始）。");
+            setLineStatus("正在引導登入 LINE...");
+            // 優化登入重定向，不傳參數讓 LIFF 自動處理
+            liff.login();
             return false;
         }
+        
         lineProfile = await liff.getProfile();
-        setLineStatus(`已登入：${lineProfile.displayName}`);
+        setLineStatus(`LINE 已連結：${lineProfile.displayName}`, false);
         renderLineProfile(lineProfile);
         document.getElementById('userName').value = lineProfile.displayName || "";
         return true;
     } catch (err) {
-        setLineStatus("LINE 登入失敗。", true);
+        console.error("LIFF Init Error:", err);
+        setLineStatus("LINE 連接失敗，請確認在 LINE App 內開啟連結。", true);
         return false;
     }
 }
 
+// 香氛人格數據
 const personalityData = {
     leader: { code: "01", name: "領導者 (Leader)", traits: "果斷、權威、目標導向", scentType: "木質辛香調", essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬", essentialOilName: "赤焰初心", perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草", perfumeName: "王者脈動", colorName: "赤炎色", colorHex: "#FF4500", liuhe: "陽火", bodySystem: "循環系統", emotion: "驕傲 / 榮耀（正向自信）", sound: "陽宮音", scentMeaning: "帶領與決斷力", healthTips: "需要注意膽的疏泄功能，壓力大可能影響決斷力。", tribe: "猶大", blessingClue: "君王血脈，萬民歸順。 (創49:8-10)", scripture: "創世記 49:8-10" },
     collaborator: { code: "02", name: "合作者 (Collaborator)", traits: "親和、包容、溫暖", scentType: "白花麝香調", essentialOilFormula: "甜橙 + 天竺葵 + 薰衣草", essentialOilName: "晨曦擁抱", perfumeFormula: "前：橘子花 | 中：玫瑰 | 後：檀香", perfumeName: "光之和諧", colorName: "橙曦色", colorHex: "#FFA500", liuhe: "陰木", bodySystem: "神經系統", emotion: "信任 / 安心", sound: "陰羽音", scentMeaning: "溫暖包容", healthTips: "情緒敏感，需注意心血管系統。", tribe: "西緬", blessingClue: "分散聯合，融入各支派。 (創49:5-7)", scripture: "創世記 49:5-7" },
@@ -212,7 +220,7 @@ let currentQuestionIndex = 0;
 const responses = {};
 const STORAGE_KEY = 'fragrancePersonalityResults';
 
-// 頁面控制
+// 頁面元件
 const infoSection = document.getElementById('infoSection');
 const questionSection = document.getElementById('questionSection');
 const resultSection = document.getElementById('resultSection');
@@ -223,16 +231,13 @@ const resultContent = document.getElementById('resultContent');
 const historyModal = document.getElementById('historyModal');
 const historyList = document.getElementById('historyList');
 
-// 開始測評
+// 事件監聽
 document.getElementById('startTestBtn').addEventListener('click', async (e) => {
     e.preventDefault();
     const ok = await initLine();
-    if (window.liff && !liff.isLoggedIn()) {
-        sessionStorage.setItem('AUTO_START_TEST', '1');
-        liff.login({ redirectUri: window.location.origin + window.location.pathname });
-        return;
-    }
     if (!ok) return;
+    if (!document.getElementById('userName').value.trim()) return alert("請輸入受測者姓名！");
+    
     currentQuestionIndex = 0;
     Object.keys(responses).forEach(key => delete responses[key]);
     infoSection.classList.add('hidden');
@@ -240,7 +245,6 @@ document.getElementById('startTestBtn').addEventListener('click', async (e) => {
     renderQuestion();
 });
 
-// 查看歷史紀錄
 document.getElementById('viewHistoryBtn').addEventListener('click', () => {
     const password = prompt("請輸入管理員密碼：");
     if (password === "a19690712") {
@@ -252,11 +256,15 @@ document.getElementById('viewHistoryBtn').addEventListener('click', () => {
 });
 
 document.getElementById('closeHistoryBtn').onclick = () => historyModal.classList.add('hidden');
+
 document.getElementById('clearHistoryBtn').onclick = () => {
-    if (confirm('確定清空？')) { localStorage.removeItem(STORAGE_KEY); loadHistory(); }
+    if (confirm('確定要清空伺服器上所有受測紀錄嗎？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadHistory();
+    }
 };
 
-// 歷史紀錄核心邏輯：列出受測者姓名、LINE ID、電話、受測結果
+// 核心功能：加載詳細歷史紀錄
 function loadHistory() {
     historyList.innerHTML = '';
     const results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -264,6 +272,7 @@ function loadHistory() {
         historyList.innerHTML = '<div class="text-center py-20 text-gray-400">尚無受測紀錄</div>';
         return;
     }
+    // 依時間降序排序 (最新在前面)
     results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
     results.forEach((item) => {
@@ -271,24 +280,28 @@ function loadHistory() {
         const lineId = (item.line && item.line.userId) ? item.line.userId : '無資料';
         
         const div = document.createElement('div');
-        div.className = 'bg-white border rounded-xl p-5 mb-4 hover:border-blue-400 hover:shadow-md cursor-pointer transition-all';
+        div.className = 'bg-white border-2 border-gray-100 rounded-2xl p-5 mb-4 hover:border-blue-400 hover:shadow-lg cursor-pointer transition-all duration-300';
         div.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="space-y-1">
+                <div class="space-y-2">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-bold">受測姓名</span>
-                        <p class="font-bold text-gray-800 text-lg">${item.userName}</p>
+                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded font-black uppercase tracking-wider">受測姓名</span>
+                        <p class="font-black text-gray-800 text-lg">${item.userName}</p>
                     </div>
-                    <p class="text-xs text-gray-600"><i class="fa fa-user-circle mr-1"></i>LINE 名稱: <span class="text-gray-900 font-medium">${lineName}</span></p>
-                    <p class="text-[10px] text-gray-400 font-mono break-all">LINE ID: ${lineId}</p>
+                    <div class="flex flex-col text-xs text-gray-500 space-y-1 bg-gray-50 p-2 rounded-lg">
+                        <p><i class="fa fa-user-circle mr-1 text-blue-400"></i>LINE 名稱: <span class="text-gray-800 font-bold">${lineName}</span></p>
+                        <p class="font-mono text-[10px] text-gray-400">LINE ID: ${lineId}</p>
+                    </div>
                 </div>
-                <div class="md:text-right space-y-1 border-t md:border-t-0 pt-2 md:pt-0">
-                    <p class="text-xs text-gray-600 font-medium"><i class="fa fa-phone mr-1"></i>電話: ${item.userPhone || '未提供'}</p>
-                    <div class="py-1">
-                        <span class="text-xs text-gray-400">分析結果</span>
-                        <p class="text-blue-600 font-black text-base">${item.type}</p>
+                <div class="md:text-right flex flex-col justify-between border-t md:border-t-0 pt-2 md:pt-0">
+                    <div>
+                        <p class="text-sm text-gray-700 font-bold"><i class="fa fa-phone mr-1 text-green-500"></i>電話: ${item.userPhone || '未提供'}</p>
+                        <div class="mt-2">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">分析結果人格</span>
+                            <p class="text-blue-600 font-black text-xl">${item.type}</p>
+                        </div>
                     </div>
-                    <p class="text-[10px] text-gray-400 italic">${new Date(item.timestamp).toLocaleString()}</p>
+                    <p class="text-[10px] text-gray-400 font-medium italic mt-2">${new Date(item.timestamp).toLocaleString()}</p>
                 </div>
             </div>
         `;
@@ -305,27 +318,38 @@ function loadHistory() {
 // 問卷邏輯
 function renderQuestion() {
     const q = questions[currentQuestionIndex];
+    const progress = Math.round(((currentQuestionIndex + 1) / questions.length) * 100);
+    
+    document.getElementById('progressText').textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
     questionContainer.innerHTML = `
-        <div class="mb-4"><span class="text-xs font-bold text-blue-500 uppercase">Step ${currentQuestionIndex + 1}/${questions.length}</span></div>
-        <h3 class="text-xl font-bold mb-6 text-gray-800 leading-tight">${q.text}</h3>
-        <div class="space-y-3">
+        <div class="w-full bg-gray-100 h-2 rounded-full mb-6 overflow-hidden">
+            <div class="bg-blue-600 h-full transition-all duration-500" style="width: ${progress}%"></div>
+        </div>
+        <h3 class="text-xl font-bold mb-8 text-gray-800 leading-snug">${q.text}</h3>
+        <div class="space-y-4">
             ${[1,2,3,4,5].map(v => `
-                <label class="flex items-center p-4 border-2 rounded-xl hover:bg-blue-50 cursor-pointer transition-colors ${responses[q.dimension] === v ? 'border-blue-500 bg-blue-50' : 'border-gray-100'}">
-                    <input type="radio" name="q${q.id}" value="${v}" class="h-5 w-5 text-blue-600" ${responses[q.dimension] === v ? 'checked' : ''}>
-                    <span class="ml-3 text-gray-700 font-medium">
+                <label class="flex items-center p-4 border-2 rounded-2xl hover:bg-blue-50 cursor-pointer transition-all duration-200 ${responses[q.dimension] === v ? 'border-blue-500 bg-blue-50 ring-4 ring-blue-50' : 'border-gray-100'}">
+                    <input type="radio" name="q" value="${v}" class="hidden" ${responses[q.dimension] === v ? 'checked' : ''} onchange="selectValue('${q.dimension}', ${v})">
+                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${responses[q.dimension] === v ? 'border-blue-500 bg-blue-500 text-white' : 'border-gray-300 bg-white'}">
+                        ${responses[q.dimension] === v ? '<i class="fa fa-check text-[10px]"></i>' : ''}
+                    </div>
+                    <span class="text-gray-700 font-bold">
                         ${v===1?'非常不同意':v===2?'不同意':v===3?'中立':v===4?'同意':'非常同意'}
                     </span>
                 </label>`).join('')}
         </div>`;
     prevQuestionBtn.disabled = currentQuestionIndex === 0;
-    nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '完成測評' : '下一題';
+    nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '提交測評結果' : '下一題';
 }
+
+window.selectValue = (dim, val) => {
+    responses[dim] = val;
+    renderQuestion();
+};
 
 nextQuestionBtn.onclick = () => {
     const q = questions[currentQuestionIndex];
-    const selected = document.querySelector(`input[name="q${q.id}"]:checked`);
-    if (!selected) return alert('請先選擇一個選項！');
-    responses[q.dimension] = parseInt(selected.value);
+    if (!responses[q.dimension]) return alert('請選擇一個符合您的程度！');
     if (currentQuestionIndex < questions.length - 1) {
         currentQuestionIndex++; renderQuestion();
     } else { showResult(); }
@@ -340,17 +364,17 @@ function showResult() {
     const tiedDimensions = Object.keys(responses).filter(dim => responses[dim] === bestScore);
     const bestDim = tiedDimensions[Math.floor(Math.random() * tiedDimensions.length)];
     const result = personalityData[bestDim];
-    const userName = document.getElementById('userName').value.trim();
-    const resultObject = { 
-        userName, 
+    
+    const obj = { 
+        userName: document.getElementById('userName').value.trim(), 
         userPhone: document.getElementById('userPhone').value.trim(),
         userNote: document.getElementById('userNote').value.trim(),
         timestamp: new Date().toISOString(), 
         type: result.name, resultCode: result.code, resultKey: bestDim, 
         line: lineProfile, details: result 
     };
-    saveResult(resultObject);
-    renderResultCard(resultObject);
+    saveResult(obj);
+    renderResultCard(obj);
 }
 
 function saveResult(obj) {
@@ -363,7 +387,8 @@ function saveResult(obj) {
         ...obj,
         'lineUserId': obj.line?.userId || '',
         'lineDisplayName': obj.line?.displayName || '',
-        'resultType': obj.type
+        'resultType': obj.type,
+        'details': JSON.stringify(obj.details)
     });
     fetch('/', { method: 'POST', body }).catch(e => console.error(e));
 }
@@ -371,41 +396,48 @@ function saveResult(obj) {
 function renderResultCard(obj) {
     const res = obj.details;
     resultContent.innerHTML = `
-        <div class="bg-blue-600 p-6 text-white rounded-t-xl">
-            <h3 class="text-2xl font-bold">${obj.userName} 的測評報告</h3>
-            <p class="text-blue-100 text-sm opacity-80 mt-1">${new Date(obj.timestamp).toLocaleString()}</p>
+        <div class="bg-blue-600 p-8 text-white rounded-t-2xl relative overflow-hidden">
+            <div class="relative z-10">
+                <h3 class="text-3xl font-black">${obj.userName} 的香氛人格報告</h3>
+                <p class="text-blue-100 text-sm opacity-80 mt-2 font-medium">測評日期：${new Date(obj.timestamp).toLocaleDateString()}</p>
+            </div>
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-[120px] font-black italic">TYPE ${res.code}</div>
         </div>
-        <div class="p-6 bg-white border-x border-b rounded-b-xl">
-            <div class="flex items-center gap-4 mb-6">
-                <div class="w-12 h-12 rounded-full shadow-inner" style="background-color: ${res.colorHex}; border: 3px solid white;"></div>
+        <div class="p-8 bg-white border-x border-b rounded-b-2xl">
+            <div class="flex items-center gap-6 mb-8">
+                <div class="w-16 h-16 rounded-full shadow-lg border-4 border-white" style="background-color: ${res.colorHex};"></div>
                 <div>
-                    <div class="text-blue-600 font-bold text-xs">TYPE ${res.code}</div>
-                    <div class="text-2xl font-black text-gray-800">${res.name}</div>
+                    <div class="text-blue-600 font-black text-xs uppercase tracking-widest">Personality Type</div>
+                    <div class="text-3xl font-black text-gray-800">${res.name}</div>
                 </div>
             </div>
-            <div class="space-y-4">
-                <p class="text-sm text-gray-600 leading-relaxed"><span class="font-bold text-gray-800">特質描述：</span>${res.traits}</p>
+            <div class="space-y-6">
+                <div class="p-4 bg-gray-50 rounded-2xl">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">人格特質描述</span>
+                    <p class="text-slate-700 font-bold leading-relaxed">${res.traits}</p>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <span class="text-[10px] font-bold text-blue-500 uppercase">專屬精油</span>
-                        <p class="font-bold text-gray-800">${res.essentialOilName}</p>
-                        <p class="text-xs text-gray-500 italic">${res.essentialOilFormula}</p>
+                    <div class="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
+                        <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest block mb-2">專屬精油建議</span>
+                        <p class="font-black text-blue-800 text-lg mb-1">${res.essentialOilName}</p>
+                        <p class="text-xs text-blue-600 font-medium">${res.essentialOilFormula}</p>
                     </div>
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <span class="text-[10px] font-bold text-purple-500 uppercase">專屬香水</span>
-                        <p class="font-bold text-gray-800">${res.perfumeName}</p>
-                        <p class="text-xs text-gray-500 italic">${res.perfumeFormula}</p>
+                    <div class="p-5 bg-purple-50/50 rounded-2xl border border-purple-100">
+                        <span class="text-[10px] font-black text-purple-500 uppercase tracking-widest block mb-2">專屬香水建議</span>
+                        <p class="font-black text-purple-800 text-lg mb-1">${res.perfumeName}</p>
+                        <p class="text-xs text-purple-600 font-medium">${res.perfumeFormula}</p>
                     </div>
                 </div>
-                <div class="p-4 bg-blue-50 rounded-xl mt-4 border border-blue-100">
-                    <div class="text-xs font-bold text-blue-800 mb-1">靈魂支派：${res.tribe}</div>
-                    <p class="text-sm italic text-blue-900 mb-2">"${res.blessingClue}"</p>
-                    <p class="text-[10px] text-blue-300 text-right">${res.scripture}</p>
+                <div class="p-6 bg-amber-50 rounded-2xl mt-6 border-2 border-amber-100 relative">
+                    <i class="fa fa-quote-left absolute top-4 left-4 text-amber-200 text-3xl"></i>
+                    <div class="relative z-10 pl-6">
+                        <div class="text-xs font-black text-amber-600 mb-2 tracking-widest uppercase">靈魂支派祝福：${res.tribe}</div>
+                        <p class="text-amber-900 font-bold italic leading-relaxed text-lg mb-3">"${res.blessingClue}"</p>
+                        <p class="text-[10px] text-amber-400 font-black text-right">— ${res.scripture}</p>
+                    </div>
                 </div>
             </div>
         </div>`;
-    document.getElementById('exportPdfBtn').onclick = () => exportReport(obj);
-    document.getElementById('restartBtn').onclick = () => window.location.reload();
 }
 
 async function exportReport(obj) {
@@ -417,17 +449,18 @@ async function exportReport(obj) {
     const w = pdf.internal.pageSize.getWidth();
     const h = (canvas.height * w) / canvas.width;
     pdf.addImage(imgData, 'PNG', 0, 0, w, h);
-    pdf.save(`${obj.userName}_香氛人格報告.pdf`);
+    pdf.save(`${obj.userName}_十二香氛人格報告.pdf`);
 }
 
-// 初始化
-(async () => {
+// 初始化啟動
+window.onload = async () => {
     await initLine();
+    // 自動開始邏輯
     if (sessionStorage.getItem('AUTO_START_TEST') === '1' && window.liff && liff.isLoggedIn()) {
         sessionStorage.removeItem('AUTO_START_TEST');
-        setTimeout(() => document.getElementById('startTestBtn').click(), 300);
+        setTimeout(() => document.getElementById('startTestBtn').click(), 400);
     }
-})();
+};
     </script>
 </body>
 </html>
