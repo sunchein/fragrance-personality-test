@@ -15,21 +15,10 @@
         .modal-backdrop {
             backdrop-filter: blur(3px);
         }
-        /* 優化加載動畫 */
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3b82f6;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans leading-relaxed">
-    <!-- Netlify Form 隱藏欄位 -->
+<body class="bg-gray-100 min-h-screen font-sans leading-relaxed">
     <form name="test-results" netlify netlify-honeypot="bot-field" hidden>
       <input type="text" name="userName" />
       <input type="text" name="userPhone" />
@@ -42,103 +31,95 @@
       <input type="text" name="resultKey" />
       <input type="text" name="timestamp" />
     </form>
-
-    <!-- 加載遮罩 -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-white z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
-        <div class="loader mb-4"></div>
-        <p class="text-slate-500 text-sm animate-pulse">正在安全連接 LINE...</p>
-    </div>
-
-    <div class="container mx-auto px-4 py-8 max-w-2xl">
+    
+    <div class="container mx-auto px-4 py-6">
         <header class="mb-8 text-center">
-            <h1 class="text-3xl font-black text-slate-800 mb-2">十二香氛人格測評系統</h1>
-            <p class="text-slate-500">探索您的支派靈魂與專屬香氛建議</p>
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">十二香氛人格測評系統</h1>
+            <p class="text-gray-600">根據十二型香氛人格理論與12支派 為您定製專屬香氛建議。</p>
         </header>
 
-        <section id="infoSection" class="bg-white p-6 rounded-2xl card-shadow mb-8">
+        <section id="infoSection" class="bg-white p-6 rounded-xl card-shadow mb-8">
             <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                 <i class="fa fa-address-card mr-3 text-blue-600"></i>受測者資訊
             </h2>
-            
-            <!-- LINE 好友與登入狀態提示 -->
-            <div id="lineStatus" class="mb-4 text-xs font-medium p-3 rounded-xl border bg-blue-50 border-blue-100 text-blue-700">
-                正在初始化 LINE 登入...
+            <div id="lineStatus" class="mb-4 text-sm text-gray-700 bg-blue-50 border border-blue-100 rounded-lg p-3">
+                正在連接 LINE...
             </div>
-
-            <div id="lineProfileCard" class="hidden mb-6 border border-slate-100 rounded-2xl p-4 bg-slate-50/50">
-              <div class="flex items-center gap-4">
-                <img id="lineAvatar" alt="LINE avatar" class="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm" src="" />
+            <div id="lineProfileCard" class="hidden mb-4 border border-gray-100 rounded-xl p-4 bg-white">
+              <div class="flex items-center gap-3">
+                <img id="lineAvatar" alt="LINE avatar" class="w-12 h-12 rounded-full object-cover border border-gray-200" />
                 <div>
-                  <div class="text-xs text-slate-400">已連結 LINE 帳號</div>
-                  <div id="lineDisplayNameDisplay" class="text-lg font-bold text-slate-800"></div>
+                  <div class="text-sm text-gray-500">已登入 LINE</div>
+                  <div id="lineDisplayNameText" class="text-base font-semibold text-gray-800"></div>
                 </div>
               </div>
             </div>
-
-            <div class="grid grid-cols-1 gap-4 mb-6" id="contactFields">
+            <!-- 修正：移除重複的 class 屬性 -->
+            <div id="contactFields" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">姓名 (由 LINE 自動帶入)</label>
-                    <input id="userName" type="text" class="w-full border-slate-200 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="請輸入姓名">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名（由 LINE 自動帶入）</label>
+                    <input id="userName" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="LINE 登入後自動帶入">
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">電話 (選填)</label>
-                        <input id="userPhone" type="tel" class="w-full border-slate-200 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="聯絡電話">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">備註 (選填)</label>
-                        <input id="userNote" type="text" class="w-full border-slate-200 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none transition-all" placeholder="備註資訊">
-                    </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">電話（選填）</label>
+                    <input id="userPhone" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                    <input id="userNote" type="text" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="可選填">
                 </div>
             </div>
-
-            <div class="flex flex-col gap-3">
-                <button id="startTestBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                    <i class="fa fa-play"></i> 開始人格分析
+            <div class="flex flex-wrap gap-3">
+                <button id="startTestBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
+                    <i class="fa fa-play mr-2"></i>開始測評
                 </button>
-                <button id="viewHistoryBtn" class="w-full py-3 text-slate-400 text-sm font-medium hover:text-slate-600 transition-colors">
-                    <i class="fa fa-history mr-1"></i> 管理員歷史紀錄
+                <button id="viewHistoryBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-6 rounded-full transition-all duration-300">
+                    <i class="fa fa-history mr-2"></i>查看歷史紀錄
                 </button>
             </div>
         </section>
 
-        <!-- 問卷區塊 -->
-        <section id="questionSection" class="bg-white p-6 rounded-2xl card-shadow mb-8 hidden">
-            <div class="flex justify-between items-center mb-6">
+        <section id="questionSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fa fa-question-circle mr-3 text-blue-600"></i>人格測評問卷
+            </h2>
+            <div id="questionContainer" class="mb-6"></div>
+            <div class="flex justify-between items-center">
+                <button id="prevQuestionBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full" disabled>上一題</button>
+                <button id="nextQuestionBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-5 rounded-full">下一題</button>
+            </div>
+        </section>
+
+        <section id="resultSection" class="bg-white p-6 rounded-xl card-shadow mb-8 hidden">
+            <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                 <h2 class="text-xl font-bold text-gray-800 flex items-center">
-                    <i class="fa fa-question-circle mr-3 text-blue-600"></i>測評問卷
+                    <i class="fa fa-star mr-3 text-blue-600"></i>測評結果
                 </h2>
-                <span id="progressText" class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase">1 / 12</span>
+                <div class="flex flex-wrap gap-2">
+                    <button id="saveResultBtn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-save mr-2"></i>保存結果
+                    </button>
+                    <button id="exportPdfBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-file-pdf-o mr-2"></i>導出報告
+                    </button>
+                    <button id="restartBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-5 rounded-full">
+                        <i class="fa fa-refresh mr-2"></i>重新測評
+                    </button>
+                </div>
             </div>
-            <div id="questionContainer" class="mb-8"></div>
-            <div class="flex gap-3">
-                <button id="prevQuestionBtn" class="flex-1 bg-slate-100 text-slate-500 font-bold py-3 rounded-xl disabled:opacity-30">上一題</button>
-                <button id="nextQuestionBtn" class="flex-[2] bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md">下一題</button>
-            </div>
+            <div id="resultContent" class="space-y-4"></div>
         </section>
 
-        <!-- 結果區塊 -->
-        <section id="resultSection" class="hidden">
-            <div id="resultContent" class="bg-white rounded-2xl card-shadow overflow-hidden mb-6">
-                <!-- 動態注入內容 -->
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="exportPdfBtn" class="bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fa fa-file-pdf-o mr-2"></i>保存 PDF</button>
-                <button id="restartBtn" class="bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg"><i class="fa fa-refresh mr-2"></i>重新測試</button>
-            </div>
-        </section>
-
-        <!-- 歷史紀錄彈窗 -->
-        <div id="historyModal" class="fixed inset-0 bg-slate-900/60 modal-backdrop hidden flex items-center justify-center z-[110] p-4">
-            <div class="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden">
-                <div class="p-5 border-b flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-slate-800">測評歷史紀錄</h3>
-                    <button id="closeHistoryBtn" class="text-slate-400 hover:text-slate-600">
+        <div id="historyModal" class="fixed inset-0 bg-black/50 modal-backdrop hidden flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">測評歷史紀錄</h3>
+                    <button id="closeHistoryBtn" class="text-gray-500 hover:text-gray-700">
                         <i class="fa fa-times text-xl"></i>
                     </button>
                 </div>
-                <div id="historyList" class="overflow-y-auto flex-grow p-6 space-y-3"></div>
-                <div class="p-4 border-t bg-slate-50 flex justify-end">
+                <div id="historyList" class="overflow-y-auto flex-grow p-6"></div>
+                <div class="p-4 border-t bg-gray-50 flex justify-end">
                     <button id="clearHistoryBtn" class="text-red-600 hover:text-red-700 text-sm font-medium">
                         <i class="fa fa-trash mr-1"></i>清空歷史
                     </button>
@@ -148,103 +129,96 @@
     </div>
 
     <script>
-// ===== LINE LIFF 設定 =====
+// ===== LINE LIFF Login START =====
 const LIFF_ID = "2008610266-8jDqPJAe";
 let lineProfile = null;
+let isLiffInit = false;
 
-// 設定狀態提示
-function setLineStatus(text, type = 'info') {
+function setLineStatus(text, isError = false) {
     const el = document.getElementById('lineStatus');
     if (!el) return;
     el.textContent = text;
-    el.className = `mb-4 text-xs font-medium p-3 rounded-xl border ${
-        type === 'error' ? 'bg-red-50 border-red-100 text-red-700' : 
-        type === 'success' ? 'bg-green-50 border-green-100 text-green-700' : 
-        'bg-blue-50 border-blue-100 text-blue-700'
-    }`;
+    el.className = `mb-4 text-sm rounded-lg p-3 border ${isError ? 'bg-red-50 border-red-100 text-red-700' : 'bg-blue-50 border-blue-100 text-gray-700'}`;
 }
 
-// 初始化 LINE LIFF
+function renderLineProfile(profile) {
+    const card = document.getElementById('lineProfileCard');
+    const avatar = document.getElementById('lineAvatar');
+    const nameText = document.getElementById('lineDisplayNameText');
+    if (!card || !avatar || !nameText) return;
+
+    avatar.src = profile.pictureUrl || "";
+    nameText.textContent = profile.displayName || "";
+    card.classList.remove('hidden');
+}
+
 async function initLine() {
+    if (isLiffInit) return true;
+    if (!window.liff) {
+        setLineStatus("未載入 LIFF SDK，請確認網路。", true);
+        return false;
+    }
+
     try {
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        isLiffInit = true;
 
         if (!liff.isLoggedIn()) {
-            setLineStatus("引導 LINE 登入中...");
-            liff.login();
+            setLineStatus("尚未登入 LINE（請點擊按鈕開始）。");
             return false;
         }
 
         lineProfile = await liff.getProfile();
-        
-        // 渲染 Profile
-        document.getElementById('lineProfileCard').classList.remove('hidden');
-        document.getElementById('lineAvatar').src = lineProfile.pictureUrl || "";
-        document.getElementById('lineDisplayNameDisplay').textContent = lineProfile.displayName || "";
-        document.getElementById('userName').value = lineProfile.displayName || "";
+        setLineStatus(`已登入：${lineProfile.displayName}`);
+        renderLineProfile(lineProfile);
 
-        // 檢查好友狀態 (需要 Scopes 開啟 friendship_status)
-        try {
-            const friendStatus = await liff.getFriendshipStatus();
-            if (friendStatus.friendFlag) {
-                setLineStatus("✓ 已加入官方帳號好友，準備開始測評", "success");
-            } else {
-                setLineStatus("! 您尚未加入好友，建議加入以接收最新資訊", "info");
-            }
-        } catch (e) {
-            setLineStatus("已連結 LINE 帳號", "success");
+        const nameInput = document.getElementById('userName');
+        if (nameInput && !nameInput.value.trim()) {
+            nameInput.value = lineProfile.displayName || "";
         }
-
-        // 隱藏 Loading
-        const loader = document.getElementById('loadingOverlay');
-        loader.classList.add('opacity-0');
-        setTimeout(() => loader.classList.add('hidden'), 500);
-
         return true;
     } catch (err) {
-        console.error("LIFF Init Error:", err);
-        setLineStatus("LINE 初始化失敗，請於 LINE 內開啟。", "error");
-        document.getElementById('loadingOverlay').classList.add('hidden');
+        console.error("LIFF error:", err);
+        setLineStatus("LINE 登入失敗，請確認 LIFF 設定。", true);
         return false;
     }
 }
+// ===== LINE LIFF Login END =====
 
-// 資料庫
 const personalityData = {
-    leader: { code: "01", name: "領導者 (Leader)", traits: "果斷、權威、目標導向", scentType: "木質辛香調", essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬", essentialOilName: "赤焰初心", perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草", perfumeName: "王者脈動", colorHex: "#FF4500", tribe: "猶大", blessingClue: "君王血脈，萬民歸順。祝福預言君王的權杖永不離開猶大，他將如同獅子般勇猛，統治並受萬民敬仰。彌賽亞將從此而出。 (創49:8-10)", scripture: "創世記 49:8-10" },
-    collaborator: { code: "02", name: "合作者 (Collaborator)", traits: "親和、包容、溫暖", scentType: "白花麝香調", essentialOilFormula: "甜橙 + 西班牙天竺葵 + 薰衣草 + 安息香", essentialOilName: "晨曦擁抱", perfumeFormula: "前：橘子花/檸檬 | 中：玫瑰/天竺葵 | 後：檀香/琥珀", perfumeName: "光之和諧", colorHex: "#FFA500", tribe: "西緬", blessingClue: "分散聯合，融入各支派。名字意為「聽見」。因其暴戾，祝福是要分散在以色列各家之中。 (創49:5-7)", scripture: "創世記 49:5-7" },
-    creator: { code: "03", name: "創意者 (Creator)", traits: "靈感、自由、藝術性", scentType: "柑橘花香調", essentialOilFormula: "檸檬 + 佛手柑 + 羅勒 + 快樂鼠尾草", essentialOilName: "金光樂章", perfumeFormula: "前：檸檬/佛手柑 | 中：鼠尾草/茉莉 | 後：雪松/岩蘭草", perfumeName: "黃金靈感", colorHex: "#FFD700", tribe: "亞設", blessingClue: "豐美尊榮，創作佳餚。祝福他擁有肥美的土地，能出產君王等級的美味佳餚。 (創49:20)", scripture: "創世記 49:20" },
-    implementer: { code: "04", name: "實踐者 (Implementer)", traits: "務實、穩定、耐力", scentType: "木質柑苔調", essentialOilFormula: "檜木 + 黑雲杉 + 絲柏", essentialOilName: "萃岩磐石", perfumeFormula: "前：綠葉/迷迭香 | 中：絲柏/薰衣草 | 後：檀香/乳香", perfumeName: "大地之母", colorHex: "#228B22", tribe: "以薩迦", blessingClue: "負重前行，建造家園。被比喻為強壯的驢，為了美好的土地甘願低肩負重，默默耕耘。 (創49:14-15)", scripture: "創世記 49:14-15" },
-    adventurer: { code: "05", name: "冒險者 (Adventurer)", traits: "好奇、勇敢、自由不羈", scentType: "清新木質調", essentialOilFormula: "薄荷 + 杜松 + 冷杉 + 冬青", essentialOilName: "芎蒼之風", perfumeFormula: "前：檸檬草/葡萄柚 | 中：薄荷/杜松子 | 後：雪松/麝香", perfumeName: "森林勇氣", colorHex: "#00BFFF", tribe: "西布倫", blessingClue: "航向四海，探索商機。祝福他住在沿海地帶，成為停船的港口，充滿探索精神。 (創49:13)", scripture: "創世記 49:13" },
-    guardian: { code: "06", name: "守護者 (Guardian)", traits: "忠誠、保護、安定", scentType: "草本花香木質調", essentialOilFormula: "乳香 + 絲柏 + 薰衣草 + 安息香", essentialOilName: "靛藍搖籃曲", perfumeFormula: "前：薰衣草/佛手柑 | 中：乳香/沒藥 | 後：岩蘭草/沉香", perfumeName: "忠誠之盾", colorHex: "#4B0082", tribe: "呂便", blessingClue: "身為長子，守護根基。為家族力量的開端，象徵家庭的根基與傳承的守護者角色。 (創49:3-4)", scripture: "創世記 49:3-4" },
-    explorer: { code: "07", name: "探索者 (Explorer)", traits: "神秘、追尋、靈性", scentType: "樹脂木質調", essentialOilFormula: "乳香 + 杜松 + 沈香子", essentialOilName: "紫晶聖壇", perfumeFormula: "前：葡萄柚/黑胡椒 | 中：薰衣草/鼠尾草 | 後：檀香/琥珀", perfumeName: "靜謐之心", colorHex: "#9370DB", tribe: "但", blessingClue: "獨闢蹊徑，智慧審判。如道上的蛇，能以智慧和出其不意的方式探索道路。 (創49:16-17)", scripture: "創世記 49:16-17" },
-    achiever: { code: "08", name: "成就者 (Achiever)", traits: "目標、驅動力、榮耀", scentType: "木質草本辛香調", essentialOilFormula: "薑 + 黑胡椒 + 肉桂葉", essentialOilName: "鎏金權杖", perfumeFormula: "前：佛手柑/葡萄柚 | 中：生薑/肉桂 | 後：檀香/乳香", perfumeName: "榮耀桂冠", colorHex: "#DAA520", tribe: "迦得", blessingClue: "戰士精神，終必得勝。擁有的戰士精神，最終必追擊敵人的腳跟，取得勝利。 (創49:19)", scripture: "創世記 49:19" },
-    idealist: { code: "09", name: "理想者 (Idealist)", traits: "浪漫、純潔、理想性", scentType: "花香柑苔調", essentialOilFormula: "天竺葵 + 薰衣草 + 佛手柑", essentialOilName: "月光聖杯", perfumeFormula: "前：橙花/檸檬 | 中：玫瑰/薰衣草 | 後：檀香/白麝香", perfumeName: "豐盛花園", colorHex: "#F0E68C", tribe: "便雅憫", blessingClue: "驍勇善戰，實現理想。作為雅各最愛之妻所生幼子，代表了理想愛情的實現。 (創49:27)", scripture: "創世記 49:27" },
-    inspirator: { code: "10", name: "靈感者 (Inspirator)", traits: "靈性、啟發、無限", scentType: "熏香琥珀調", essentialOilFormula: "檸檬 + 迷迭香 + 快樂鼠尾草", essentialOilName: "銀河星塵", perfumeFormula: "前：檸檬/薄荷 | 中：迷迭香/鼠尾草 | 後：雪松/琥珀", perfumeName: "啟迪之光", colorHex: "#E6E6FA", tribe: "拿弗他利", blessingClue: "自由釋放，言語嘉美。被形容為被釋放的母鹿，能出嘉美的言語，具有啟發人心能力。 (創49:21)", scripture: "創世記 49:21" },
-    architect: { code: "11", name: "建築大師 (Architect)", traits: "穩固、結構、務實", scentType: "綠意柑苔調", essentialOilFormula: "黑雲杉 + 肖楠 + 芳樟", essentialOilName: "大地基石", perfumeFormula: "前：綠葉/黑胡椒 | 中：絲柏/雪松 | 後：岩蘭草/檀香", perfumeName: "蒼翠之柱", colorHex: "#8B4513", tribe: "約瑟", blessingClue: "啟示豐盛，建立未來。擁有解夢啟示恩賜，象徵著超越限制的豐盛與建造能力。 (創49:22-26)", scripture: "創世記 49:22-26" },
-    soulMentor: { code: "12", name: "靈魂導師 (Soul Mentor)", traits: "智慧、聖潔、啟迪", scentType: "花香東方調", essentialOilFormula: "乳香 + 安息香 + 沈香子", essentialOilName: "聖愛光冕", perfumeFormula: "前：橙花/佛手柑 | 中：乳香/沒藥 | 後：檀香/琥珀/麝香", perfumeName: "聖潔同在", colorHex: "#FFFACD", tribe: "利未", blessingClue: "分別為聖，教導律法。被揀選成為祭司支派，職責是引導百姓，是靈魂導師。 (申33:10)", scripture: "申命記 33:8-11" }
+    leader: { code: "01", name: "領導者 (Leader)", traits: "果斷、權威、目標導向", scentType: "木質辛香調", essentialOilFormula: "黑胡椒 + 肉桂皮 + 薑 + 佛手柑 + 檸檬", essentialOilName: "赤焰初心", perfumeFormula: "前：佛手柑/葡萄柚 | 中：黑胡椒/薑 | 後：雪松/乳香/岩蘭草", perfumeName: "王者脈動", colorName: "赤炎色", colorHex: "#FF4500", liuhe: "陽火", bodySystem: "循環系統", emotion: "驕傲 / 榮耀（正向自信）", sound: "陽宮音", scentMeaning: "帶領與決斷力", healthTips: "需要注意膽的疏泄功能，壓力大或作息不規律可能影響決斷力，易有偏頭痛、失眠問題。", healthBenefit: "心血管系統，強化循環，提升決斷力；需注意膽經，避免熬夜導致偏頭痛、失眠。", tribe: "猶大", blessingClue: "君王血脈，萬民歸順。祝福預言君王的權杖永不離開猶大，他將如同獅子般勇猛，統治並受萬民敬仰。 (創49:8-10)", scripture: "創世記 49:8-10" },
+    collaborator: { code: "02", name: "合作者 (Collaborator)", traits: "親和、包容、溫暖", scentType: "白花麝香調", essentialOilFormula: "甜橙 + 西班牙天竺葵 + 薰衣草 + 安息香", essentialOilName: "晨曦擁抱", perfumeFormula: "前：橘子花/檸檬 | 中：玫瑰/天竺葵 | 後：檀香/琥珀", perfumeName: "光之和諧", colorName: "橙曦色", colorHex: "#FFA500", liuhe: "陰木", bodySystem: "神經系統", emotion: "信任 / 安心", sound: "陰羽音", scentMeaning: "溫暖包容", healthTips: "情緒敏感，需注意心血管系統，避免過度為他人犧牲導致心力耗損。", healthBenefit: "神經系統，舒緩焦慮，提升情感連結；需注意心血管與心包經健康。", tribe: "西緬", blessingClue: "分散聯合，融入各支派。名字意為「聽見」。因其暴戾，祝福是要分散在以色列各家之中。 (創49:5-7)", scripture: "創世記 49:5-7" },
+    creator: { code: "03", name: "創意者 (Creator)", traits: "靈感、自由、藝術性", scentType: "柑橘花香調", essentialOilFormula: "檸檬 + 佛手柑 + 羅勒 + 快樂鼠尾草", essentialOilName: "金光樂章", perfumeFormula: "前：檸檬/佛手柑 | 中：鼠尾草/茉莉 | 後：雪松/岩蘭草", perfumeName: "黃金靈感", colorName: "金光色", colorHex: "#FFD700", liuhe: "陽木", bodySystem: "消化系統", emotion: "快樂 / 靈感", sound: "陽角音", scentMeaning: "靈感創造力", healthTips: "情緒起伏大，需注意心的功能，如思維與情緒管理，心火過旺影響睡眠。", healthBenefit: "腦神經與消化，提升專注與靈感；需注意心火過旺影響睡眠。", tribe: "亞設", blessingClue: "豐美尊榮，創作佳餚。祝福他擁有肥美的土地，能出產君王等級的美味佳餚。 (創49:20)", scripture: "創世記 49:20" },
+    implementer: { code: "04", name: "實踐者 (Implementer)", traits: "務實、穩定、耐力", scentType: "木質芳香馥奇–柑苔調", essentialOilFormula: "檜木 + 黑雲杉 + 薰衣草 + 絲柏", essentialOilName: "萃岩磐石", perfumeFormula: "前：綠葉/迷迭香 | 中：絲柏/薰衣草 | 後：檀香/乳香", perfumeName: "大地之母", colorName: "翠岩色", colorHex: "#228B22", liuhe: "陽土", bodySystem: "肌肉系統", emotion: "期待 / 毅力", sound: "陽徵音", scentMeaning: "執行與穩健", healthTips: "可能過於保守固執，需注意消化系統功能，避免過度思慮影響胃氣。", healthBenefit: "肌肉骨骼，提升耐力與持續力；需注意消化系統避免胃脹與消化不良。", tribe: "以薩迦", blessingClue: "負重前行，建造家園。被比喻為強壯的驢，甘願低肩負重，默默耕耘。 (創49:14-15)", scripture: "創世記 49:14-15" },
+    adventurer: { code: "05", name: "冒險者 (Adventurer)", traits: "好奇、勇敢、自由不羈", scentType: "清新木質調", essentialOilFormula: "薄荷 + 杜松 + 冷杉 + 冬青", essentialOilName: "芎蒼之風", perfumeFormula: "前：檸檬草/葡萄柚 | 中：薄荷/杜松子 | 後：雪松/麝香", perfumeName: "森林勇氣", colorName: "蒼穹色", colorHex: "#00BFFF", liuhe: "陽金", bodySystem: "呼吸系統", emotion: "驚訝 / 勇氣", sound: "陽商音", scentMeaning: "探索與自由", healthTips: "好奇心強但易缺耐心，需注意膀胱經與水液代謝，避免腰背酸痛。", healthBenefit: "呼吸系統，清新暢通，帶來冒險能量；需注意膀胱經與水液代謝。", tribe: "西布倫", blessingClue: "航向四海，探索商機。祝福他住在沿海地帶，境界延展，充滿了向外探索的精神。 (創49:13)", scripture: "創世記 49:13" },
+    guardian: { code: "06", name: "守護者 (Guardian)", traits: "忠誠、保護、安定", scentType: "草本花香木質調", essentialOilFormula: "乳香 + 絲柏 + 薰衣草 + 安息香", essentialOilName: "靛藍搖籃曲", perfumeFormula: "前：薰衣草/佛手柑 | 中：乳香/沒藥 | 後：岩蘭草/沉香", perfumeName: "忠誠之盾", colorName: "靛藍色", colorHex: "#4B0082", liuhe: "陰火", bodySystem: "免疫系統", emotion: "愛 / 溫柔力量", sound: "陰宮音", scentMeaning: "保護與忠誠", healthTips: "可能過度擔憂、犧牲自我，需注意脾胃與氣血生成。", healthBenefit: "免疫系統，鎮靜安定，守護身心；需注意脾胃與氣血生成，避免過度思慮。", tribe: "呂便", blessingClue: "身為長子，守護根基。為雅各的長子，是家族力量的開端，象徵著家庭的根基。 (創49:3-4)", scripture: "創世記 49:3-4" },
+    explorer: { code: "07", name: "探索者 (Explorer)", traits: "神秘、追尋、靈性", scentType: "樹脂木質調", essentialOilFormula: "乳香 + 杜松 + 快樂鼠尾草 + 沈香子", essentialOilName: "紫晶聖壇", perfumeFormula: "前：葡萄柚/黑胡椒 | 中：薰衣草/鼠尾草 | 後：檀香/琥珀", perfumeName: "靜謐之心", colorName: "紫晶色", colorHex: "#9370DB", liuhe: "陰靈", bodySystem: "內分泌系統", emotion: "神秘 / 直覺", sound: "陰角音", scentMeaning: "靈性追尋", healthTips: "可能顯得孤僻，不易親近，需注意全身氣機與內分泌平衡。", healthBenefit: "靈性與內分泌，助於冥想與內觀；需注意三焦氣機與睡眠品質。", tribe: "但", blessingClue: "獨闢蹊徑，智慧審判。祝福他能審判自己的民，並如道上的蛇，充滿謀略。 (創49:16-17)", scripture: "創世記 49:16-17" },
+    achiever: { code: "08", name: "成就者 (Achiever)", traits: "目標、驅動力、榮耀", scentType: "木質草本辛香調", essentialOilFormula: "薑 + 黑胡椒 + 肉桂葉 + 療創木", essentialOilName: "鎏金權杖", perfumeFormula: "前：佛手柑/葡萄柚 | 中：生薑/肉桂 | 後：檀香/乳香", perfumeName: "榮耀桂冠", colorName: "鎏金色", colorHex: "#DAA520", liuhe: "陽火", bodySystem: "消化＋肝膽", emotion: "憤怒→驅動力", sound: "陽羽音", scentMeaning: "成就與榮耀", healthTips: "可能控制慾強、易累積壓力，需注意肝氣疏泄，避免眼睛疲勞。", healthBenefit: "消化與循環，增強動力與行動力；需注意肝氣疏泄與眼睛疲勞。", tribe: "迦得", blessingClue: "戰士精神，終必得勝。祝福他雖會被敵軍攻擊，卻擁有戰士精神，最終必取得勝利。 (創49:19)", scripture: "創世記 49:19" },
+    idealist: { code: "09", name: "理想者 (Idealist)", traits: "浪漫、純潔、理想性", scentType: "花香柑苔調", essentialOilFormula: "西班牙天竺葵 + 薰衣草 + 佛手柑 + 芳樟", essentialOilName: "月光聖杯", perfumeFormula: "前：橙花/檸檬 | 中：玫瑰/薰衣草 | 後：檀香/白麝香", perfumeName: "豐盛花園", colorName: "月光色", colorHex: "#F0E68C", liuhe: "陰木", bodySystem: "呼吸 / 肺系統", emotion: "悲傷→慈悲", sound: "陰商音", scentMeaning: "浪漫與理想", healthTips: "可能不切實際，過於感性，需注意呼吸系統與免疫力。", healthBenefit: "神經與情緒，帶來浪漫與平衡；需注意肺功能與免疫。", tribe: "便雅憫", blessingClue: "驍勇善戰，實現理想。祝福形容他如撕掠的狼，能主動出擊以獲取和分配戰利品。 (創49:27)", scripture: "創世記 49:27" },
+    inspirator: { code: "10", name: "靈感者 (Inspirator)", traits: "靈性、啟發、無限", scentType: "熏香琥珀東方調", essentialOilFormula: "檸檬 + 迷迭香 + 快樂鼠尾草 + 綠花白千層", essentialOilName: "銀河星塵", perfumeFormula: "前：檸檬/薄荷 | 中：迷迭香/鼠尾草 | 後：雪松/琥珀", perfumeName: "啟迪之光", colorName: "銀河色", colorHex: "#E6E6FA", liuhe: "陽靈", bodySystem: "泌尿 / 腎系統", emotion: "焦慮→靈感", sound: "陽徵音", scentMeaning: "啟迪與靈性", healthTips: "內在矛盾、容易焦慮，需注意泌尿生殖系統與腎精。", healthBenefit: "腦神經與呼吸，開啟洞察與靈感；需注意腎精與記憶力。", tribe: "拿弗他利", blessingClue: "自由釋放，言語嘉美。被形容為「被釋放的母鹿」，充滿自由、敏捷與優雅的生命力。 (創49:21)", scripture: "創世記 49:21" },
+    architect: { code: "11", name: "建築大師 (Architect)", traits: "穩固、結構、務實", scentType: "綠意柑苔調", essentialOilFormula: "黑雲杉 + 紫檀 + 肖楠 + 芳樟", essentialOilName: "大地基石", perfumeFormula: "前：綠葉/黑胡椒 | 中：絲柏/雪松 | 後：岩蘭草/檀香", perfumeName: "蒼翠之柱", colorName: "大地色", colorHex: "#8B4513", liuhe: "陰土", bodySystem: "骨骼 / 皮膚系統", emotion: "羞愧→責任", sound: "陰羽音", scentMeaning: "結構與穩固", healthTips: "壓力巨大、責任感重，需注意腸道健康與排泄功能。", healthBenefit: "骨骼與皮膚，建立結構與保護力；需注意腸道健康。", tribe: "約瑟", blessingClue: "啟示豐盛，建立未來。祝福他是泉旁多結果子的枝子，象徵著超越限制的豐盛與建造能力。 (創49:22-26)", scripture: "創世記 49:22-26" },
+    soulMentor: { code: "12", name: "靈魂導師 (Soul Mentor)", traits: "智慧、靈魂啟迪、聖潔", scentType: "花香東方調", essentialOilFormula: "乳香 + 安息香 + 沈香子 + 羅文莎葉", essentialOilName: "聖愛光冕", perfumeFormula: "前：橙花/佛手柑 | 中：乳香/沒藥 | 後：檀香/琥珀/麝香", perfumeName: "聖潔同在", colorName: "聖光色", colorHex: "#FFFACD", liuhe: "陰靈", bodySystem: "生殖＋小腸", emotion: "愛 / 智慧", sound: "陰徵音", scentMeaning: "聖潔與啟發", healthTips: "需在理想與現實中平衡，避免過度犧牲，注意小腸功能與營養吸收。", healthBenefit: "靈性與免疫，深層冥想與靈魂啟發；需注意小腸功能。", tribe: "利未", blessingClue: "分別為聖，教導律法。職責是教導神的律法典章，獻祭並引導百姓，是國家的靈魂導師。 (申33:10)", scripture: "申命記 33:8-11" }
 };
 
 const questions = [
-    { id: 1, text: "我喜歡設定方向並帶領他人完成目標。", dim: "leader" },
-    { id: 2, text: "我重視團隊合作，願意聆聽並支持他人。", dim: "collaborator" },
-    { id: 3, text: "我富有創意，喜歡嘗試新點子或藝術表達。", dim: "creator" },
-    { id: 4, text: "我務實穩健，喜歡按計劃持續推進。", dim: "implementer" },
-    { id: 5, text: "我喜歡冒險和探索未知，對新體驗充滿好奇。", dim: "adventurer" },
-    { id: 6, text: "我具備保護他人與提供支持的天性。", dim: "guardian" },
-    { id: 7, text: "我對自我靈性層面感興趣，喜歡探索神秘。", dim: "explorer" },
-    { id: 8, text: "我有強烈的目標感和驅動力。", dim: "achiever" },
-    { id: 9, text: "我注重理想與浪漫，常常從夢想獲得力量。", dim: "idealist" },
-    { id: 10, text: "我對啟發性的經驗感興趣，尋求內在洞察。", dim: "inspirator" },
-    { id: 11, text: "我善於建立結構與秩序，重視實用與穩固。", dim: "architect" },
-    { id: 12, text: "我渴望啟迪他人靈魂，追求智慧與聖潔的生活。", dim: "soulMentor" }
+    { id: 1, text: "我喜歡設定方向並帶領他人完成目標。", dimension: "leader" }, 
+    { id: 2, text: "我重視團隊合作，願意聆聽並支持他人。", dimension: "collaborator" }, 
+    { id: 3, text: "我富有創意，喜歡嘗試新點子或藝術表達。", dimension: "creator" }, 
+    { id: 4, text: "我務實穩健，喜歡按計劃持續推進。", dimension: "implementer" }, 
+    { id: 5, text: "我喜歡冒險和探索未知，對新體驗充滿好奇。", dimension: "adventurer" }, 
+    { id: 6, text: "我具備保護他人與提供支持的天性，重視安全與忠誠。", dimension: "guardian" }, 
+    { id: 7, text: "我對宇宙與自我靈性層面感興趣，喜歡探索神秘事物。", dimension: "explorer" }, 
+    { id: 8, text: "我有強烈的目標感和驅動力，渴望達成卓越成就。", dimension: "achiever" }, 
+    { id: 9, text: "我注重理想與浪漫，常常從夢想中獲得力量。", dimension: "idealist" }, 
+    { id: 10, text: "我對靈性與啟發性的經驗感興趣，熱衷於尋求內在洞察。", dimension: "inspirator" }, 
+    { id: 11, text: "我善於建立結構與秩序，重視實用與穩固。", dimension: "architect" }, 
+    { id: 12, text: "我渴望啟迪他人靈魂，追求智慧與聖潔的生活。", dimension: "soulMentor" }
 ];
 
-let currentIdx = 0;
+let currentQuestionIndex = 0;
 const responses = {};
 const STORAGE_KEY = 'fragrancePersonalityResults';
 
-// 頁面元素
 const infoSection = document.getElementById('infoSection');
 const questionSection = document.getElementById('questionSection');
 const resultSection = document.getElementById('resultSection');
@@ -255,179 +229,221 @@ const resultContent = document.getElementById('resultContent');
 const historyModal = document.getElementById('historyModal');
 const historyList = document.getElementById('historyList');
 
-// 事件綁定
-document.getElementById('startTestBtn').onclick = () => {
-    if (!document.getElementById('userName').value.trim()) return alert("請輸入您的姓名");
-    startAssessment();
-};
-
-function startAssessment() {
-    currentIdx = 0;
+document.getElementById('startTestBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const ok = await initLine();
+    if (window.liff && !liff.isLoggedIn()) {
+        sessionStorage.setItem('AUTO_START_TEST', '1');
+        liff.login({ redirectUri: window.location.origin + window.location.pathname });
+        return;
+    }
+    if (!ok) {
+        alert('LINE 初始化失敗，請檢查設定。');
+        return;
+    }
+    currentQuestionIndex = 0;
     Object.keys(responses).forEach(key => delete responses[key]);
     infoSection.classList.add('hidden');
     questionSection.classList.remove('hidden');
     renderQuestion();
-}
+});
 
-function renderQuestion() {
-    const q = questions[currentIdx];
-    document.getElementById('progressText').textContent = `${currentIdx + 1} / ${questions.length}`;
-    questionContainer.innerHTML = `
-        <h3 class="text-xl font-bold text-slate-800 mb-6">${q.text}</h3>
-        <div class="space-y-3">
-            ${[1,2,3,4,5].map(v => `
-                <button onclick="selectAnswer('${q.dim}', ${v})" class="w-full text-left p-4 border rounded-2xl font-medium transition-all ${responses[q.dim] === v ? 'border-blue-600 bg-blue-50 text-blue-700 ring-2 ring-blue-100' : 'border-slate-100 hover:border-blue-200'}">
-                    ${v===1?'非常不同意':v===2?'不同意':v===3?'普通':v===4?'同意':'非常同意'}
-                </button>
-            `).join('')}
-        </div>
-    `;
-    prevQuestionBtn.disabled = currentIdx === 0;
-    nextQuestionBtn.textContent = currentIdx === questions.length - 1 ? '查看分析結果' : '下一題';
-}
+// 管理歷史紀錄點擊事件
+document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+    const password = prompt("請輸入管理員密碼：");
+    // 修正：依據使用者要求設定密碼為 a19690712
+    if (password === "a19690712") {
+        loadHistory();
+        historyModal.classList.remove('hidden');
+    } else if (password !== null) {
+        alert('密碼錯誤！');
+    }
+});
 
-window.selectAnswer = (dim, val) => {
-    responses[dim] = val;
-    renderQuestion();
-};
+document.getElementById('closeHistoryBtn').addEventListener('click', () => {
+    historyModal.classList.add('hidden');
+});
 
-nextQuestionBtn.onclick = () => {
-    if (!responses[questions[currentIdx].dim]) return alert("請先選擇一個選項");
-    if (currentIdx < questions.length - 1) {
-        currentIdx++;
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    if (confirm('確定要清空所有歷史紀錄嗎？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        loadHistory();
+    }
+});
+
+prevQuestionBtn.addEventListener('click', () => {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        renderQuestion();
+    }
+});
+
+nextQuestionBtn.addEventListener('click', () => {
+    const current = questions[currentQuestionIndex];
+    const selected = document.querySelector('input[name="q' + current.id + '"]:checked');
+    if (!selected) { alert('請選擇一個選項後再繼續！'); return; }
+    responses[current.dimension] = parseInt(selected.value);
+    if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
         renderQuestion();
     } else {
         showResult();
     }
-};
+});
 
-prevQuestionBtn.onclick = () => {
-    if (currentIdx > 0) { currentIdx--; renderQuestion(); }
-};
+function renderQuestion() {
+    const q = questions[currentQuestionIndex];
+    questionContainer.innerHTML = `
+        <div class="mb-4"><span class="text-sm font-medium text-gray-500">問題 ${currentQuestionIndex + 1}/${questions.length}</span></div>
+        <h3 class="text-lg font-semibold mb-4 text-gray-800">${q.text}</h3>
+        <div class="space-y-3">
+            ${[1,2,3,4,5].map(value => `
+                <label class="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    <input type="radio" name="q${q.id}" value="${value}" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" ${ (responses[q.dimension] === value) ? 'checked' : '' }>
+                    <span class="text-gray-700">
+                        ${value === 1 ? '非常不同意' : value === 2 ? '不同意' : value === 3 ? '中立' : value === 4 ? '同意' : '非常同意'}
+                    </span>
+                </label>
+            `).join('')}
+        </div>`;
+    prevQuestionBtn.disabled = currentQuestionIndex === 0;
+    nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? '提交測評' : '下一題';
+}
 
 function showResult() {
     questionSection.classList.add('hidden');
     resultSection.classList.remove('hidden');
-    
     const bestScore = Math.max(...Object.values(responses));
     const tiedDimensions = Object.keys(responses).filter(dim => responses[dim] === bestScore);
     const bestDim = tiedDimensions[Math.floor(Math.random() * tiedDimensions.length)];
     const result = personalityData[bestDim];
+    const userName = (lineProfile && lineProfile.displayName) ? lineProfile.displayName : document.getElementById('userName').value.trim();
+    const userPhone = document.getElementById('userPhone').value.trim();
+    const userNote = document.getElementById('userNote').value.trim();
+    const timestamp = new Date().toISOString();
+    const resultObject = { userName, userPhone, userNote, timestamp, type: result.name, resultCode: result.code, resultKey: bestDim, line: lineProfile, details: result };
     
-    const obj = {
-        userName: document.getElementById('userName').value.trim(),
-        userPhone: document.getElementById('userPhone').value.trim(),
-        userNote: document.getElementById('userNote').value.trim(),
-        timestamp: new Date().toISOString(),
-        type: result.name,
-        line: lineProfile,
-        details: result
+    saveResult(resultObject);
+    renderResultCard(resultObject);
+    
+    document.getElementById('saveResultBtn').onclick = () => { alert('結果已成功保存！'); };
+    document.getElementById('exportPdfBtn').onclick = () => exportReport(resultObject);
+    document.getElementById('restartBtn').onclick = () => {
+        resultSection.classList.add('hidden');
+        infoSection.classList.remove('hidden');
+        document.getElementById('userName').value = '';
+        document.getElementById('userPhone').value = '';
+        document.getElementById('userNote').value = '';
+    };
+}
+
+function saveResult(obj) {
+    let localResults = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    localResults.push(obj);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(localResults));
+
+    const formData = {
+        'form-name': 'test-results',
+        'userName': obj.userName,
+        'userPhone': obj.userPhone,
+        'userNote': obj.userNote,
+        'resultType': obj.type,
+        'resultCode': obj.resultCode || '',
+        'resultKey': obj.resultKey || '',
+        'timestamp': obj.timestamp || '',
+        'lineUserId': (obj.line && obj.line.userId) ? obj.line.userId : '',
+        'lineDisplayName': (obj.line && obj.line.displayName) ? obj.line.displayName : '',
+        'linePictureUrl': (obj.line && obj.line.pictureUrl) ? obj.line.pictureUrl : ''
     };
     
-    saveResult(obj);
-    renderResultCard(obj);
+    fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+    }).catch(e => console.error(e));
 }
 
-function renderResultCard(obj) {
-    const d = obj.details;
+function renderResultCard(resultObject) {
+    const res = resultObject.details;
     resultContent.innerHTML = `
-        <div class="p-8 text-white relative overflow-hidden" style="background-color: ${d.colorHex}">
-            <div class="relative z-10">
-                <div class="text-[10px] font-black opacity-80 uppercase tracking-[0.2em] mb-1">Your Fragrance Identity</div>
-                <h2 class="text-4xl font-black">${d.name}</h2>
-                <p class="mt-2 opacity-90 text-sm">受測者：${obj.userName}</p>
-            </div>
-            <div class="absolute -right-8 -bottom-8 opacity-20 text-8xl font-black">TYPE ${d.code}</div>
+        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <h3 class="text-lg font-bold text-gray-800">受測者：${resultObject.userName}</h3>
+            <p class="text-sm text-gray-600 mt-1">測評時間：${new Date(resultObject.timestamp).toLocaleString()}</p>
         </div>
-        <div class="p-6 space-y-6 bg-white">
-            <div class="flex items-start gap-4">
-                <div class="w-1 rounded-full h-12 bg-blue-600"></div>
-                <div>
-                    <span class="text-[10px] font-bold text-slate-400 uppercase">核心特質</span>
-                    <p class="text-lg font-bold text-slate-800">${d.traits}</p>
-                </div>
+        <div class="border rounded-xl p-6 card-shadow">
+            <div class="flex items-center mb-4">
+                <div class="w-8 h-8 rounded-full mr-3" style="background-color: ${res.colorHex};"></div>
+                <h2 class="text-xl font-bold text-gray-800 flex-1">${res.code} ${res.name}</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="text-[10px] font-bold text-blue-600 mb-2">專屬精油：${d.essentialOilName}</div>
-                    <p class="text-sm text-slate-600">${d.essentialOilFormula}</p>
-                </div>
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="text-[10px] font-bold text-purple-600 mb-2">專屬香水：${d.perfumeName}</div>
-                    <p class="text-sm text-slate-600">${d.perfumeFormula}</p>
-                </div>
+            <p class="text-sm text-gray-600 mb-2 font-medium">特質：${res.traits}</p>
+            <p class="text-sm text-gray-600 mb-2 font-medium">專屬精油：${res.essentialOilName} (${res.essentialOilFormula})</p>
+            <p class="text-sm text-gray-600 mb-2 font-medium">專屬香水：${res.perfumeName} (${res.perfumeFormula})</p>
+            <div class="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-4 pt-2 border-t">
+                <div>屬性：${res.liuhe}</div>
+                <div>系統：${res.bodySystem}</div>
+                <div>情緒：${res.emotion}</div>
+                <div>支派：${res.tribe}</div>
             </div>
-            <div class="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-                <div class="text-xs font-bold text-blue-800 mb-2">靈魂支派：${d.tribe}</div>
-                <p class="text-sm italic text-blue-900 leading-relaxed mb-3">"${d.blessingClue}"</p>
-                <div class="text-[10px] text-blue-400 font-bold">— ${d.scripture}</div>
-            </div>
-        </div>
-    `;
+            <p class="text-sm text-gray-600 italic border-l-4 border-blue-200 pl-3 py-1 mb-2">${res.blessingClue}</p>
+            <p class="text-xs text-gray-400 text-right">${res.scripture}</p>
+        </div>`;
 }
 
-async function saveResult(obj) {
-    // Local
-    let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    history.push(obj);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-
-    // Netlify
-    const body = new URLSearchParams({
-        'form-name': 'test-results',
-        ...obj,
-        'lineUserId': obj.line?.userId || '',
-        'lineDisplayName': obj.line?.displayName || '',
-        'linePictureUrl': obj.line?.pictureUrl || '',
-        'resultType': obj.type
-    });
-    fetch('/', { method: 'POST', body });
-}
-
-document.getElementById('exportPdfBtn').onclick = async () => {
-    const { jsPDF } = window.jspdf;
-    const canvas = await html2canvas(document.getElementById('resultContent'), { scale: 2 });
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const w = pdf.internal.pageSize.getWidth();
-    const h = (canvas.height * w) / canvas.width;
-    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
-    pdf.save(`人格報告_${document.getElementById('userName').value}.pdf`);
-};
-
-document.getElementById('restartBtn').onclick = () => window.location.reload();
-
-document.getElementById('viewHistoryBtn').onclick = () => {
-    if (prompt("請輸入管理密碼：") === "sun20020503") {
-        historyModal.classList.remove('hidden');
-        renderHistory();
+function loadHistory() {
+    historyList.innerHTML = '';
+    const results = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    if (results.length === 0) {
+        historyList.innerHTML = '<p class="text-center text-gray-500">暫無測評記錄</p>';
+        return;
     }
-};
-
-function renderHistory() {
-    const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    historyList.innerHTML = list.length ? list.reverse().map(h => `
-        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-            <div class="flex justify-between items-start">
+    results.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    results.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'border rounded-lg p-4 mb-3 hover:bg-gray-50 cursor-pointer transition-colors';
+        div.innerHTML = `
+            <div class="flex justify-between items-center">
                 <div>
-                    <div class="font-bold text-slate-800">${h.userName}</div>
-                    <div class="text-[10px] text-slate-400">${new Date(h.timestamp).toLocaleString()}</div>
+                    <p class="font-medium text-gray-800">${item.userName}</p>
+                    <p class="text-xs text-gray-500">${new Date(item.timestamp).toLocaleString()}</p>
                 </div>
-                <div class="text-blue-600 font-bold text-sm">${h.type}</div>
-            </div>
-        </div>
-    `).join('') : '<p class="text-center text-slate-400 py-8">尚無紀錄</p>';
+                <div class="text-blue-600 text-sm font-medium">${item.type}</div>
+            </div>`;
+        div.onclick = () => {
+            historyModal.classList.add('hidden');
+            infoSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            renderResultCard(item);
+        };
+        historyList.appendChild(div);
+    });
 }
 
-document.getElementById('closeHistoryBtn').onclick = () => historyModal.classList.add('hidden');
-document.getElementById('clearHistoryBtn').onclick = () => {
-    if (confirm("確定清空所有紀錄嗎？")) { localStorage.removeItem(STORAGE_KEY); renderHistory(); }
-};
+async function exportReport(obj) {
+    const { jsPDF } = window.jspdf;
+    const element = document.getElementById('resultContent');
+    element.classList.remove('card-shadow');
+    const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+    element.classList.add('card-shadow');
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const margin = 40;
+    const contentWidth = pdfWidth - margin * 2;
+    const imgHeight = canvas.height * contentWidth / canvas.width;
+    pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, imgHeight);
+    pdf.save(`${obj.userName}_香氛人格報告.pdf`);
+}
 
-// 進入自動執行
-window.onload = async () => {
+// 初始化
+(async () => {
     await initLine();
-    // 如果偵測到特定參數或從 LINE 返回，可自動觸發點擊，但目前保留手動點擊開始以確認姓名。
-};
+    const shouldAutoStart = sessionStorage.getItem('AUTO_START_TEST') === '1';
+    if (shouldAutoStart && window.liff && liff.isLoggedIn()) {
+        sessionStorage.removeItem('AUTO_START_TEST');
+        setTimeout(() => { document.getElementById('startTestBtn').click(); }, 300);
+    }
+})();
     </script>
 </body>
 </html>
